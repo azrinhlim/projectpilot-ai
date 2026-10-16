@@ -4,332 +4,335 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ProjectPilot AI v4.1</title>
+<meta name="theme-color" content="#ffffff">
+<title>ProjectPilot AI | Project Command Center</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/lucide-static@latest/font/lucide.css" rel="stylesheet">
 
 <style>
 :root {
-  --blue:#3976f6;
-  --purple:#8259f5;
-  --ink:#16233b;
-  --muted:#8190a9;
+  --white:#ffffff;
+  --bg:#ffffff;
+  --ink:#15213a;
+  --muted:#8492a9;
   --border:#e9eef6;
-  --green:#00a981;
-  --orange:#e98d2a;
+  --blue:#3d78f6;
+  --purple:#865cf6;
+  --green:#00a77e;
+  --orange:#e99035;
+  --red:#e85b65;
+  --soft:#f8faff;
+  --shadow:0 8px 30px rgba(35,62,105,.035);
 }
-
 * {box-sizing:border-box}
-
+html {scroll-behavior:smooth}
 body {
   margin:0;
-  background:#fff;
+  background:var(--bg);
   color:var(--ink);
-  font:13px 'DM Sans',sans-serif;
+  font:13px "DM Sans",sans-serif;
 }
-
 button,input {font:inherit}
 button {cursor:pointer}
 button:focus-visible,input:focus-visible {
-  outline:3px solid #b8ccff;
+  outline:3px solid #bad0ff;
   outline-offset:2px;
 }
-
 .app {display:flex;min-height:100vh}
 
+/* SIDEBAR */
 .sidebar {
   width:235px;
+  flex:none;
   height:100vh;
   position:sticky;
   top:0;
-  flex-shrink:0;
-  background:#fff;
-  border-right:1px solid var(--border);
   display:flex;
   flex-direction:column;
-  transition:width .25s;
+  background:white;
+  border-right:1px solid var(--border);
+  transition:width .25s ease;
   overflow:hidden;
+  z-index:10;
 }
-
 .sidebar.collapsed {width:72px}
-
 .brand {
   display:flex;
   align-items:center;
-  gap:11px;
-  padding:25px 18px 35px;
+  gap:12px;
+  padding:25px 18px 34px;
   white-space:nowrap;
 }
-
 .logo {
   width:40px;
   height:40px;
+  flex:none;
   border-radius:13px;
-  background:linear-gradient(135deg,#4386ff,#935bff);
+  background:linear-gradient(135deg,#4486ff,#925bff);
+  color:white;
   display:grid;
   place-items:center;
-  color:white;
   font-size:23px;
-  flex-shrink:0;
+  box-shadow:0 6px 18px rgba(99,106,240,.18);
 }
-
 .brand strong {
-  font:800 15px 'Plus Jakarta Sans';
+  display:block;
+  font:800 15px "Plus Jakarta Sans";
+  letter-spacing:-.4px;
 }
-
 .brand small {
   display:block;
-  color:var(--muted);
   margin-top:4px;
+  color:var(--muted);
   font-size:10px;
 }
-
-.sidebar.collapsed .brand-text,
-.sidebar.collapsed .nav-label,
-.sidebar.collapsed .side-note {display:none}
-
-.nav {display:grid;gap:5px;padding:0 10px}
-
-.nav button {
+.navigation {
+  display:grid;
+  gap:5px;
+  padding:0 10px;
+}
+.nav-btn {
   border:0;
   background:transparent;
   display:flex;
   align-items:center;
   gap:14px;
-  text-align:left;
   height:45px;
-  padding:0 15px;
+  width:100%;
   border-radius:11px;
-  color:#586b89;
+  padding:0 15px;
+  color:#596b88;
+  text-align:left;
   font-weight:700;
   white-space:nowrap;
 }
-
-.nav button.active {
-  color:#286cf2;
+.nav-btn:hover {background:#f7f9ff}
+.nav-btn.active {
   background:#edf3ff;
+  color:#286cf3;
 }
-
-.nav button:hover {background:#f5f8ff}
-
-.nav i {font-size:18px;width:20px}
-
-.sidebar.collapsed .nav button {
+.nav-btn i {
+  width:20px;
+  text-align:center;
+  font-size:18px;
+}
+.sidebar.collapsed .brand-text,
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .side-note {display:none}
+.sidebar.collapsed .nav-btn {
   justify-content:center;
   padding:0;
 }
-
-.sidebar-footer {
+.side-footer {
   margin-top:auto;
   padding:12px;
 }
-
 .side-note {
   background:#f8faff;
   border:1px solid var(--border);
-  border-radius:13px;
+  border-radius:14px;
   padding:14px;
   line-height:1.7;
 }
-
 .side-note small {
   display:block;
   color:var(--muted);
-  margin-top:6px;
+  margin-top:5px;
 }
-
-.collapse {
+.collapse-btn {
   margin-top:12px;
   width:40px;
   height:40px;
   border:1px solid var(--border);
-  background:white;
   border-radius:11px;
-  color:#647797;
+  background:white;
+  color:#637796;
+}
+.sidebar.collapsed .collapse-btn {
+  display:block;
+  margin:12px auto 0;
 }
 
+/* MAIN */
 .main {
   flex:1;
   min-width:0;
-  padding:30px clamp(18px,3vw,52px) 70px;
+  padding:28px clamp(18px,3vw,52px) 70px;
 }
-
 .topbar {
   display:flex;
-  justify-content:flex-end;
   align-items:center;
-  gap:20px;
+  justify-content:flex-end;
+  gap:18px;
   margin-bottom:30px;
 }
-
 .top-search {
-  width:320px;
-  max-width:100%;
   display:flex;
   align-items:center;
   gap:10px;
-  background:#fafbff;
-  border:1px solid var(--border);
-  border-radius:12px;
+  width:320px;
+  max-width:100%;
   padding:12px;
+  border:1px solid var(--border);
+  background:#fafbff;
+  border-radius:12px;
+  color:#8290a8;
 }
-
 .top-search input {
   border:0;
   background:transparent;
   outline:0;
   width:100%;
   font-size:12px;
+  color:var(--ink);
 }
-
 .profile {
-  width:36px;
-  height:36px;
-  background:#eef3ff;
+  width:37px;
+  height:37px;
   border-radius:50%;
+  background:#edf3ff;
   display:grid;
   place-items:center;
+  color:#58729d;
   font-weight:800;
-  color:#4c6b9b;
 }
-
 .welcome {
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  gap:15px;
+  align-items:center;
+  gap:20px;
   margin-bottom:26px;
 }
-
-.eyebrow {color:#7083a1;font-size:12px}
-
+.eyebrow {
+  color:#7183a1;
+  font-size:12px;
+}
 h1 {
-  font:800 clamp(23px,2.5vw,32px) 'Plus Jakarta Sans';
+  font:800 clamp(23px,2.5vw,32px) "Plus Jakarta Sans";
   letter-spacing:-1px;
   margin:9px 0;
 }
-
-.subtitle {color:var(--muted);margin:0}
-
+.subtitle {
+  color:var(--muted);
+  margin:0;
+  line-height:1.6;
+}
 .primary {
-  background:linear-gradient(110deg,#4482fa,#8359f2);
-  color:white;
   border:0;
   border-radius:11px;
-  padding:13px 18px;
+  padding:13px 19px;
+  background:linear-gradient(115deg,#4382fa,#855af3);
+  color:white;
   font-weight:700;
   white-space:nowrap;
+  box-shadow:0 8px 22px rgba(77,111,235,.17);
 }
-
+.primary i {margin-right:7px}
 .page {display:none}
 .page.active {display:block}
 
+/* CARDS */
+.card,.stat {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:17px;
+  box-shadow:var(--shadow);
+}
+.card {
+  padding:22px;
+  margin-bottom:20px;
+}
+.card-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+h2 {
+  margin:0;
+  font:800 15px "Plus Jakarta Sans";
+  letter-spacing:-.3px;
+}
+.link-btn {
+  background:transparent;
+  border:0;
+  color:var(--blue);
+  font-size:11px;
+  font-weight:700;
+}
 .stats {
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:17px;
   margin-bottom:20px;
 }
-
-.card,.stat {
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:17px;
-  box-shadow:0 7px 28px #233e6707;
-}
-
-.stat {padding:20px}
-
+.stat {padding:21px}
 .stat-icon {
-  width:44px;
-  height:44px;
-  border-radius:13px;
+  width:46px;
+  height:46px;
+  border-radius:14px;
   display:grid;
   place-items:center;
   font-size:21px;
   margin-bottom:14px;
 }
-
-.stat-icon.blue {background:#ebf2ff;color:var(--blue)}
-.stat-icon.green {background:#e8f9f2;color:var(--green)}
-.stat-icon.orange {background:#fff2e5;color:var(--orange)}
+.stat-icon.blue {background:#eaf2ff;color:var(--blue)}
+.stat-icon.green {background:#e8f9f3;color:var(--green)}
+.stat-icon.orange {background:#fff2e6;color:var(--orange)}
 .stat-icon.purple {background:#f1ebff;color:var(--purple)}
-
 .stat strong {
   display:block;
-  font:800 28px 'Plus Jakarta Sans';
+  font:800 29px "Plus Jakarta Sans";
+}
+.stat small {
+  display:block;
+  color:var(--muted);
+  margin-top:7px;
 }
 
-.stat small {display:block;color:var(--muted);margin-top:7px}
-
+/* DASHBOARD */
 .dashboard-grid {
   display:grid;
-  grid-template-columns:minmax(0,1.8fr) minmax(350px,.85fr);
+  grid-template-columns:minmax(0,1.75fr) minmax(300px,.85fr);
   gap:20px;
   align-items:start;
 }
-
-.card {padding:22px;margin-bottom:20px}
-
-.card-head {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin-bottom:17px;
-}
-
-h2 {font:800 15px 'Plus Jakarta Sans';margin:0}
-
-.link {
-  background:none;
-  border:0;
-  color:var(--blue);
-  font-size:11px;
-  font-weight:700;
-}
-
 .search {
   width:100%;
-  background:#fbfcff;
+  padding:12px 13px;
   border:1px solid var(--border);
+  background:#fbfcff;
   border-radius:10px;
-  padding:12px;
   margin-bottom:13px;
+  outline-color:#b6caff;
 }
-
 .table-wrap {overflow-x:auto}
-
 table {
-  width:100%;
   border-collapse:collapse;
-  min-width:580px;
+  width:100%;
+  min-width:590px;
 }
-
 th {
   text-align:left;
   padding:12px 9px;
-  color:var(--muted);
   font-size:10px;
+  color:var(--muted);
 }
-
 td {
+  border-top:1px solid #f0f3f9;
   padding:14px 9px;
-  border-top:1px solid #eff2f8;
   font-size:11px;
 }
-
 .project-name {font-weight:700}
-
 .project-name small {
   display:block;
-  color:var(--muted);
-  font-weight:400;
   margin-top:5px;
+  font-weight:400;
+  color:var(--muted);
 }
-
-.badge {
+.status {
   display:inline-block;
   border-radius:20px;
   padding:6px 10px;
@@ -337,44 +340,41 @@ td {
   font-weight:700;
   white-space:nowrap;
 }
-
-.badge.track {background:#e7f9f2;color:#009a74}
-.badge.risk {background:#fff1e5;color:#c47c24}
-.badge.done {background:#e7f9f2;color:#009a74}
-
+.status.track {background:#e7f9f1;color:#009b75}
+.status.risk {background:#fff1e5;color:#ce8122}
+.status.done {background:#e7f9f1;color:#009b75}
 .progress {
-  height:6px;
-  background:#edf1f8;
-  border-radius:10px;
   width:85px;
+  height:6px;
+  border-radius:10px;
   overflow:hidden;
+  background:#edf1f8;
 }
-
 .progress span {
-  height:100%;
   display:block;
-  background:#4b81ff;
+  height:100%;
+  background:#4d83ff;
   border-radius:10px;
 }
-
 .lower-grid {
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:16px;
 }
-
 .lower-grid .card {margin:0}
-
 .donut {
   width:112px;
   height:112px;
+  margin:15px auto;
   border-radius:50%;
-  background:conic-gradient(#f45a63 0 40%,#ffad45 40% 60%,#4280ff 60% 100%);
+  background:conic-gradient(
+    #f45a63 0 40%,
+    #ffad45 40% 60%,
+    #4280ff 60% 100%
+  );
   display:grid;
   place-items:center;
-  margin:15px auto;
 }
-
 .donut-inner {
   width:73px;
   height:73px;
@@ -384,61 +384,128 @@ td {
   place-items:center;
   text-align:center;
 }
-
 .donut-inner strong {font-size:22px}
-.donut-inner small {color:var(--muted);font-size:9px}
-
-.legend {font-size:10px;color:#7484a0;line-height:2}
-
+.donut-inner small {font-size:9px;color:var(--muted)}
+.legend {
+  font-size:10px;
+  color:#7484a0;
+  line-height:2.1;
+}
 .item {
   padding:12px 0;
   border-bottom:1px solid #f0f3f9;
 }
-
-.item:last-child {border:0}
+.item:last-child {border-bottom:0}
 .item strong {font-size:11px}
-.item small {display:block;color:var(--muted);margin-top:6px;line-height:1.5}
-
+.item small {
+  display:block;
+  margin-top:6px;
+  color:var(--muted);
+  line-height:1.5;
+}
 .sample-note {
-  color:#98a4b6;
+  color:#98a5b7;
   font-size:11px;
   line-height:1.7;
 }
 
-/* REAL AI CHAT INSIDE DASHBOARD */
-
-.ai-card {
-  padding:0;
-  overflow:hidden;
-  height:720px;
-  display:flex;
-  flex-direction:column;
+/* AI INSIGHTS */
+.insights-card {
+  background:linear-gradient(160deg,#f9fbff,#ffffff);
 }
-
-.ai-header {
+.insight-heading {
   display:flex;
   align-items:center;
   gap:12px;
-  padding:18px;
-  border-bottom:1px solid var(--border);
+  margin-bottom:18px;
 }
-
-.ai-header .logo {width:39px;height:39px}
-
-.ai-header strong {font-size:14px}
-.ai-header small {display:block;color:var(--muted);margin-top:5px}
-
-.ai-header .link {margin-left:auto}
-
-.ai-frame {
-  flex:1;
-  min-height:0;
+.insight-heading .logo {
+  width:42px;
+  height:42px;
+}
+.insight-heading strong {
+  display:block;
+  font:800 15px "Plus Jakarta Sans";
+}
+.insight-heading small {
+  display:block;
+  color:var(--muted);
+  margin-top:5px;
+}
+.insight-intro {
+  color:#5d6d87;
+  line-height:1.8;
+  font-size:12px;
+  margin-bottom:20px;
+}
+.insight-action {
   width:100%;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-align:left;
+  border:1px solid var(--border);
   background:white;
+  border-radius:12px;
+  padding:14px 13px;
+  margin-bottom:10px;
+  color:#253650;
+  font-size:11px;
+  font-weight:700;
+  transition:background .2s,border-color .2s;
+}
+.insight-action:hover {
+  border-color:#b7ccff;
+  background:#f9fbff;
+}
+.insight-action i {
+  font-size:18px;
+  color:var(--blue);
+}
+.insight-action span {flex:1}
+.insight-action .arrow {color:#a6b2c4}
+.insight-footer {
+  margin-top:18px;
+  padding-top:16px;
+  border-top:1px solid var(--border);
+  color:#8b99ad;
+  font-size:10px;
+  line-height:1.7;
+}
+.quick-card {
+  padding:22px;
+}
+.quick-card p {
+  color:#7587a1;
+  line-height:1.7;
+  font-size:12px;
+}
+.quick-card .primary {width:100%;margin-top:12px}
+
+/* FULL AI WORKSPACE */
+.assistant-workspace {
+  padding:0;
   overflow:hidden;
 }
-
-.ai-frame iframe,
+.assistant-header {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+}
+.assistant-header .logo {width:40px;height:40px}
+.assistant-header strong {font-size:14px}
+.assistant-header small {
+  display:block;
+  color:var(--muted);
+  margin-top:5px;
+}
+.full-chat {
+  height:calc(100dvh - 245px);
+  min-height:600px;
+  width:100%;
+}
 .full-chat iframe,
 .popup-body iframe {
   display:block;
@@ -448,29 +515,32 @@ td {
   background:white;
 }
 
-.full-chat {
-  height:calc(100dvh - 240px);
-  min-height:580px;
-}
-
+/* OTHER PAGES */
 .doc-row {
   display:flex;
+  align-items:flex-start;
   gap:13px;
   padding:18px 0;
   border-bottom:1px solid var(--border);
 }
-
-.doc-row i {font-size:21px;color:var(--blue)}
+.doc-row i {
+  font-size:21px;
+  color:var(--blue);
+}
 .doc-row strong {font-size:12px}
-.doc-row small {display:block;color:var(--muted);margin-top:5px}
+.doc-row small {
+  display:block;
+  color:var(--muted);
+  margin-top:5px;
+  line-height:1.6;
+}
 
 /* FLOATING CHAT */
-
 .float-btn {
   position:fixed;
   right:23px;
   bottom:22px;
-  z-index:100;
+  z-index:101;
   width:59px;
   height:59px;
   border:0;
@@ -480,7 +550,6 @@ td {
   font-size:25px;
   box-shadow:0 9px 25px #5b7dff55;
 }
-
 .popup {
   display:none;
   position:fixed;
@@ -489,7 +558,7 @@ td {
   width:560px;
   max-width:calc(100vw - 24px);
   height:calc(100dvh - 95px);
-  z-index:99;
+  z-index:100;
   background:white;
   border:1px solid var(--border);
   border-radius:18px;
@@ -497,10 +566,8 @@ td {
   box-shadow:0 20px 70px #233d6855;
   flex-direction:column;
 }
-
 .popup.open {display:flex}
 .popup.expanded {width:min(950px,calc(100vw - 36px))}
-
 .popup-header {
   display:flex;
   align-items:center;
@@ -508,38 +575,42 @@ td {
   padding:15px;
   border-bottom:1px solid var(--border);
 }
-
 .popup-header .logo {width:37px;height:37px}
 .popup-header strong {font-size:13px}
-.popup-header small {display:block;color:var(--muted);margin-top:4px}
-
-.popup-controls {margin-left:auto;display:flex;gap:7px}
-
+.popup-header small {
+  display:block;
+  color:var(--muted);
+  margin-top:4px;
+}
+.popup-controls {
+  margin-left:auto;
+  display:flex;
+  gap:7px;
+}
 .popup-controls button {
   border:1px solid var(--border);
   background:white;
   border-radius:9px;
   width:34px;
   height:34px;
+  color:#536782;
 }
-
 .popup-body {flex:1;min-height:0}
 
+/* RESPONSIVE */
 @media(max-width:1250px) {
   .dashboard-grid {grid-template-columns:1fr}
-  .ai-card {min-height:600px}
-  .ai-frame {min-height:550px}
 }
-
 @media(max-width:950px) {
-  .stats {grid-template-columns:repeat(2,1fr)}
+  .stats {grid-template-columns:repeat(2,minmax(0,1fr))}
   .lower-grid {grid-template-columns:1fr 1fr}
 }
-
 @media(max-width:650px) {
   .sidebar {width:65px}
-  .sidebar .brand-text,.sidebar .nav-label,.side-note {display:none}
-  .nav button {justify-content:center;padding:0}
+  .sidebar .brand-text,
+  .sidebar .nav-label,
+  .sidebar .side-note {display:none}
+  .sidebar .nav-btn {justify-content:center;padding:0}
   .main {padding:20px 13px 70px}
   .topbar {margin-bottom:22px}
   .welcome {flex-direction:column;align-items:flex-start}
@@ -548,7 +619,8 @@ td {
   .stat strong {font-size:24px}
   .lower-grid {grid-template-columns:1fr}
   .card {padding:16px}
-  .ai-card {padding:0}
+  .assistant-workspace {padding:0}
+  .full-chat {min-height:550px}
   .popup,.popup.expanded {
     right:8px;
     top:8px;
@@ -558,23 +630,6 @@ td {
   }
   .float-btn {right:13px;bottom:13px}
 }
-  .ai-frame iframe {
-  width:100%;
-  height:100%;
-  display:block;
-  border:0;
-}
-
-@media(max-width:1250px) {
-  .ai-card {
-    height:700px;
-    min-height:0;
-  }
-
-  .ai-frame {
-    min-height:0;
-  }
-}
 </style>
 </head>
 
@@ -582,6 +637,7 @@ td {
 
 <div class="app">
 
+<!-- SIDEBAR -->
 <aside class="sidebar collapsed" id="sidebar">
   <div class="brand">
     <div class="logo">✦</div>
@@ -591,38 +647,45 @@ td {
     </div>
   </div>
 
-  <nav class="nav">
-    <button class="active" data-page="overview" title="Overview">
-      <i class="icon icon-house"></i><span class="nav-label">Overview</span>
+  <nav class="navigation">
+    <button class="nav-btn active" data-page="overview" title="Overview">
+      <i class="icon icon-house"></i>
+      <span class="nav-label">Overview</span>
     </button>
-    <button data-page="projects" title="Projects">
-      <i class="icon icon-folder"></i><span class="nav-label">Projects</span>
+    <button class="nav-btn" data-page="projects" title="Projects">
+      <i class="icon icon-folder"></i>
+      <span class="nav-label">Projects</span>
     </button>
-    <button data-page="risks" title="Risks & Issues">
-      <i class="icon icon-triangle-alert"></i><span class="nav-label">Risks & Issues</span>
+    <button class="nav-btn" data-page="risks" title="Risks & Issues">
+      <i class="icon icon-triangle-alert"></i>
+      <span class="nav-label">Risks & Issues</span>
     </button>
-    <button data-page="reports" title="Reports">
-      <i class="icon icon-chart-column"></i><span class="nav-label">Reports</span>
+    <button class="nav-btn" data-page="reports" title="Reports">
+      <i class="icon icon-chart-column"></i>
+      <span class="nav-label">Reports</span>
     </button>
-    <button data-page="documents" title="Documents">
-      <i class="icon icon-file-text"></i><span class="nav-label">Documents</span>
+    <button class="nav-btn" data-page="documents" title="Documents">
+      <i class="icon icon-file-text"></i>
+      <span class="nav-label">Documents</span>
     </button>
-    <button data-page="assistant" title="AI Assistant">
-      <i class="icon icon-sparkles"></i><span class="nav-label">AI Assistant</span>
+    <button class="nav-btn" data-page="assistant" title="AI Assistant">
+      <i class="icon icon-sparkles"></i>
+      <span class="nav-label">AI Assistant</span>
     </button>
   </nav>
 
-  <div class="sidebar-footer">
+  <div class="side-footer">
     <div class="side-note">
       <strong>✦ Smarter projects with AI</strong>
       <small>Plan, track and deliver with confidence.</small>
     </div>
-    <button class="collapse" id="sidebar-toggle" title="Toggle sidebar">
+    <button class="collapse-btn" id="sidebar-toggle" title="Expand or collapse sidebar">
       <i class="icon icon-panel-left"></i>
     </button>
   </div>
 </aside>
 
+<!-- MAIN -->
 <main class="main">
 
   <div class="topbar">
@@ -641,11 +704,12 @@ td {
         Track progress, identify risks and take action with your AI assistant.
       </p>
     </div>
-    <button class="primary" id="new-project">＋ New Project</button>
+    <button class="primary" id="new-project">
+      <i class="icon icon-plus"></i> New Project
+    </button>
   </div>
 
   <!-- OVERVIEW -->
-
   <section class="page active" id="page-overview">
 
     <div class="stats">
@@ -673,12 +737,13 @@ td {
 
     <div class="dashboard-grid">
 
+      <!-- LEFT CONTENT -->
       <div>
 
         <div class="card">
           <div class="card-head">
             <h2>Project portfolio</h2>
-            <button class="link" data-goto="projects">View all →</button>
+            <button class="link-btn" data-goto="projects">View all →</button>
           </div>
 
           <input class="search" id="dash-search" placeholder="Search projects...">
@@ -702,18 +767,16 @@ td {
         <div class="lower-grid">
 
           <div class="card">
-            <div class="card-head">
-              <h2>Risk & issue overview</h2>
-            </div>
+            <div class="card-head"><h2>Risk & issue overview</h2></div>
             <div class="donut">
               <div class="donut-inner">
                 <div><strong>5</strong><br><small>Total</small></div>
               </div>
             </div>
             <div class="legend">
-              🔴 2 High impact
-              <br>🟠 1 Medium impact
-              <br>🔵 2 Low impact
+              🔴 2 High impact<br>
+              🟠 1 Medium impact<br>
+              🔵 2 Low impact
             </div>
           </div>
 
@@ -752,34 +815,77 @@ td {
         </div>
 
         <p class="sample-note">
-          Dashboard data is illustrative and not yet connected to Dataverse.
+          Dashboard figures and project information are illustrative and not yet connected to Dataverse.
         </p>
+
       </div>
 
-      <!-- LIVE GROUP 10 CHAT -->
+      <!-- RIGHT CONTENT: AI INSIGHTS, NOT CHAT -->
+      <div>
 
-      <aside class="card ai-card">
+        <div class="card insights-card">
 
-        <div class="ai-header">
-          <div class="logo">✦</div>
-          <div>
-            <strong>AI Assistant</strong>
-            <small>Live Group 10 · Copilot Studio</small>
+          <div class="insight-heading">
+            <div class="logo">✦</div>
+            <div>
+              <strong>AI Project Insights</strong>
+              <small>Powered by Group 10</small>
+            </div>
           </div>
-          <button class="link" id="open-assistant">
-            <i class="icon icon-expand"></i>
+
+          <p class="insight-intro">
+            Get a clearer picture of project delivery. Ask Group 10 to
+            review project progress, highlight potential risks and
+            recommend your next actions.
+          </p>
+
+          <button class="insight-action" data-insight="summary">
+            <i class="icon icon-chart-column"></i>
+            <span>Summarize projects</span>
+            <i class="icon icon-chevron-right arrow"></i>
+          </button>
+
+          <button class="insight-action" data-insight="risks">
+            <i class="icon icon-triangle-alert" style="color:#e95c67"></i>
+            <span>Identify risks & issues</span>
+            <i class="icon icon-chevron-right arrow"></i>
+          </button>
+
+          <button class="insight-action" data-insight="actions">
+            <i class="icon icon-list-checks" style="color:#00a77e"></i>
+            <span>Recommend next actions</span>
+            <i class="icon icon-chevron-right arrow"></i>
+          </button>
+
+          <div class="insight-footer">
+            Select an action to open the live Group 10 assistant.
+            Enter your request directly in the Microsoft chat.
+          </div>
+
+        </div>
+
+        <div class="card quick-card">
+          <div class="card-head">
+            <h2>AI Assistant Workspace</h2>
+            <i class="icon icon-sparkles" style="color:#7a61ef;font-size:20px"></i>
+          </div>
+
+          <p>
+            Need help planning a project, updating progress or
+            preparing documents? Work directly with Group 10.
+          </p>
+
+          <button class="primary" id="open-workspace">
+            <i class="icon icon-sparkles"></i> Open AI Assistant
           </button>
         </div>
 
-        <div class="ai-frame" id="dashboard-chat"></div>
-
-      </aside>
+      </div>
 
     </div>
   </section>
 
   <!-- PROJECTS -->
-
   <section class="page" id="page-projects">
     <div class="card">
       <div class="card-head">
@@ -807,12 +913,11 @@ td {
   </section>
 
   <!-- RISKS -->
-
   <section class="page" id="page-risks">
     <div class="card">
       <h2>Risk & issue management</h2>
       <p class="subtitle" style="margin:15px 0">
-        Identify and monitor project risks, issues and changes.
+        Identify, assess and monitor project risks, issues and changes.
       </p>
 
       <div class="doc-row">
@@ -835,18 +940,17 @@ td {
         <i class="icon icon-refresh-cw"></i>
         <div>
           <strong>Change control</strong>
-          <small>Scope and change impact management — planned.</small>
+          <small>Scope changes and impact management — planned.</small>
         </div>
       </div>
 
       <button class="primary" data-chat style="margin-top:20px">
-        Ask Group 10
+        <i class="icon icon-sparkles"></i> Ask Group 10
       </button>
     </div>
   </section>
 
   <!-- REPORTS -->
-
   <section class="page" id="page-reports">
     <div class="card">
       <h2>Reports & insights</h2>
@@ -855,7 +959,7 @@ td {
         <i class="icon icon-chart-column"></i>
         <div>
           <strong>Project status reports</strong>
-          <small>Progress and delivery summaries.</small>
+          <small>Progress, milestone and delivery summaries.</small>
         </div>
       </div>
 
@@ -868,13 +972,12 @@ td {
       </div>
 
       <button class="primary" data-chat style="margin-top:20px">
-        Generate insights with Group 10
+        <i class="icon icon-sparkles"></i> Generate insights with Group 10
       </button>
     </div>
   </section>
 
   <!-- DOCUMENTS -->
-
   <section class="page" id="page-documents">
     <div class="card">
       <h2>Document workspace</h2>
@@ -883,7 +986,7 @@ td {
         <i class="icon icon-file-text"></i>
         <div>
           <strong>Request for Quotation</strong>
-          <small>Prepare procurement documents.</small>
+          <small>Prepare procurement requirements and RFQ documents.</small>
         </div>
       </div>
 
@@ -891,7 +994,7 @@ td {
         <i class="icon icon-files"></i>
         <div>
           <strong>Business cases and approvals</strong>
-          <small>Prepare project supporting papers.</small>
+          <small>Prepare supporting project documentation.</small>
         </div>
       </div>
 
@@ -904,22 +1007,22 @@ td {
       </div>
 
       <button class="primary" data-chat style="margin-top:20px">
-        Open document assistant
+        <i class="icon icon-sparkles"></i> Open document assistant
       </button>
     </div>
   </section>
 
-  <!-- FULL ASSISTANT -->
-
+  <!-- DEDICATED AI ASSISTANT -->
   <section class="page" id="page-assistant">
-    <div class="card" style="padding:0;overflow:hidden">
-      <div class="ai-header">
+    <div class="card assistant-workspace">
+      <div class="assistant-header">
         <div class="logo">✦</div>
         <div>
           <strong>Group 10 Project Assistant</strong>
-          <small>Copilot Studio · Live Chat</small>
+          <small>Live Copilot Studio · ProjectPilot AI</small>
         </div>
       </div>
+
       <div class="full-chat" id="full-chat"></div>
     </div>
   </section>
@@ -928,7 +1031,6 @@ td {
 </div>
 
 <!-- FLOATING CHAT -->
-
 <button class="float-btn" id="float-btn" aria-label="Open AI chat">✦</button>
 
 <div class="popup" id="popup">
@@ -940,8 +1042,8 @@ td {
     </div>
 
     <div class="popup-controls">
-      <button id="expand-chat" title="Expand">⛶</button>
-      <button id="close-chat" title="Close">✕</button>
+      <button id="expand-chat" title="Expand chat">⛶</button>
+      <button id="close-chat" title="Close chat">✕</button>
     </div>
   </div>
 
@@ -949,9 +1051,7 @@ td {
 </div>
 
 <script>
-
-/* EXISTING GROUP 10 CONNECTION */
-
+/* WORKING GROUP 10 CONNECTION */
 const envId="37954b56-6662-eab5-8c43-065ce3edaff5";
 const botName="cr4a6_Group10";
 
@@ -961,7 +1061,6 @@ const embedUrl=
 const $=id=>document.getElementById(id);
 
 /* SAMPLE PROJECT DATA */
-
 const projects=[
   {name:"Cafe at Main Branch",dept:"Facilities",status:"On track",progress:75,owner:"SH",date:"25 Dec 2026"},
   {name:"Office Renovation",dept:"Administration",status:"On track",progress:60,owner:"AK",date:"30 Nov 2026"},
@@ -985,7 +1084,7 @@ function renderProjects(id,query="") {
           ${p.name}
           <small>${p.dept}</small>
         </td>
-        <td><span class="badge ${badge}">${p.status}</span></td>
+        <td><span class="status ${badge}">${p.status}</span></td>
         <td>
           <div class="progress">
             <span style="width:${p.progress}%"></span>
@@ -1002,18 +1101,38 @@ function renderProjects(id,query="") {
 renderProjects("dash-projects");
 renderProjects("all-projects");
 
-$("dash-search").oninput=e=>renderProjects("dash-projects",e.target.value);
-$("all-search").oninput=e=>renderProjects("all-projects",e.target.value);
+$("dash-search").oninput=e=>
+  renderProjects("dash-projects",e.target.value);
 
-/* NAVIGATION */
+$("all-search").oninput=e=>
+  renderProjects("all-projects",e.target.value);
 
+/* PAGE NAVIGATION */
 const pageTitles={
-  overview:["Your project portfolio at a glance","Track progress, identify risks and take action with your AI assistant."],
-  projects:["Project portfolio","Track projects and delivery progress."],
-  risks:["Risks & issues","Monitor project risks and issues."],
-  reports:["Reports & insights","Turn project data into insights."],
-  documents:["Document workspace","Manage project documents and approvals."],
-  assistant:["AI Assistant","Talk directly with Group 10."]
+  overview:[
+    "Your project portfolio at a glance",
+    "Track progress, identify risks and take action with your AI assistant."
+  ],
+  projects:[
+    "Project portfolio",
+    "Track projects and delivery progress."
+  ],
+  risks:[
+    "Risks & issues",
+    "Monitor project risks and issues."
+  ],
+  reports:[
+    "Reports & insights",
+    "Turn project information into actionable insights."
+  ],
+  documents:[
+    "Document workspace",
+    "Manage project documents and approvals."
+  ],
+  assistant:[
+    "AI Assistant",
+    "Work directly with Group 10."
+  ]
 };
 
 function setPage(name) {
@@ -1021,7 +1140,7 @@ function setPage(name) {
     p.classList.toggle("active",p.id==="page-"+name)
   );
 
-  document.querySelectorAll(".nav button").forEach(b=>
+  document.querySelectorAll(".nav-btn").forEach(b=>
     b.classList.toggle("active",b.dataset.page===name)
   );
 
@@ -1041,15 +1160,29 @@ document.querySelectorAll("[data-goto]").forEach(b=>
   b.onclick=()=>setPage(b.dataset.goto)
 );
 
-$("open-assistant").onclick=()=>setPage("assistant");
+$("open-workspace").onclick=()=>setPage("assistant");
+
+/* AI INSIGHT QUICK ACTIONS */
+const insightPrompts={
+  summary:"Summarize the current status of all active projects.",
+  risks:"Identify current project risks, issues and delays.",
+  actions:"Recommend the next priority actions for active projects."
+};
+
+document.querySelectorAll("[data-insight]").forEach(b=>{
+  b.onclick=()=>{
+    setPage("assistant");
+    /* The Microsoft iframe is cross-origin.
+       We cannot insert the prompt automatically.
+       User enters the request in Group 10. */
+  };
+});
 
 /* SIDEBAR */
-
 $("sidebar-toggle").onclick=()=>
   $("sidebar").classList.toggle("collapsed");
 
-/* LOAD REAL GROUP 10 */
-
+/* LOAD REAL GROUP 10 CHAT */
 function loadChat(id) {
   const container=$(id);
 
@@ -1063,14 +1196,7 @@ function loadChat(id) {
   container.appendChild(iframe);
 }
 
-/* IMPORTANT:
-   Load actual Group 10 directly into dashboard.
-   No fake chat input. */
-
-loadChat("dashboard-chat");
-
 /* FLOATING CHAT */
-
 function openChat() {
   $("popup").classList.add("open");
   $("float-btn").textContent="✕";
@@ -1098,8 +1224,7 @@ $("expand-chat").onclick=()=>{
     $("popup").classList.contains("expanded")?"❐":"⛶";
 };
 
-/* SEARCH */
-
+/* GLOBAL SEARCH */
 $("global-search").onkeydown=e=>{
   if(e.key==="Enter") {
     setPage("projects");
@@ -1108,12 +1233,11 @@ $("global-search").onkeydown=e=>{
   }
 };
 
-/* ESC */
-
+/* ESCAPE */
 document.addEventListener("keydown",e=>{
   if(e.key==="Escape") closeChat();
 });
-
 </script>
+
 </body>
 </html>
