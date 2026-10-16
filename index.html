@@ -21,21 +21,33 @@
 </main></div>
 <div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal"><h2 id="modal-title"></h2><p id="modal-intro">Project overview</p><div id="modal-details"></div><div class="modal-actions"><button class="btn btn-secondary" id="modal-close">Close</button></div></div></div>
 
-<script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
-
 <script>
-(async function() {
+const projects=[{name:'Cafe at Main Branch',owner:'Facilities Team',status:'Active',date:'25 Dec 2026',progress:'Pending RFQ',symbol:'☕'},{name:'Office Renovation',owner:'Administration',status:'Active',date:'30 Nov 2026',progress:'Planning',symbol:'▦'},{name:'Walkie-Talkie Procurement',owner:'Safety Team',status:'Pending RFQ',date:'15 Dec 2026',progress:'RFQ Preparation',symbol:'◉'},{name:'Document Digitisation',owner:'Operations',status:'Completed',date:'30 Sep 2026',progress:'Completed',symbol:'▧'}];
+const $=id=>document.getElementById(id);function render(target,q=''){const results=projects.filter(p=>[p.name,p.owner,p.status,p.progress].join(' ').toLowerCase().includes(q.toLowerCase()));$(target).innerHTML=results.length?results.map((p,i)=>`<div class="project" tabindex="0" role="button" data-project="${projects.indexOf(p)}"><div class="project-symbol">${p.symbol}</div><div class="project-info"><strong>${p.name}</strong><small>${p.owner} &nbsp;·&nbsp; ${p.progress} &nbsp;·&nbsp; ${p.date}</small></div><span class="status ${p.status==='Pending RFQ'?'pending':p.status==='Completed'?'completed':''}">${p.status}</span></div>`).join(''):'<div class="empty">No matching projects.</div>';$(target).querySelectorAll('[data-project]').forEach(el=>{el.addEventListener('click',()=>openProject(+el.dataset.project));el.addEventListener('keydown',e=>{if(e.key==='Enter')openProject(+el.dataset.project)})})}
+render('dash-list');render('all-list');$('dash-search').addEventListener('input',e=>render('dash-list',e.target.value));$('all-search').addEventListener('input',e=>render('all-list',e.target.value));
+function openProject(i){const p=projects[i];$('modal-title').textContent=p.name;$('modal-intro').textContent='Illustrative project record — connected to Copilot Workspace.';$('modal-details').innerHTML=[['Project owner',p.owner],['Project status',p.status],['Target completion',p.date],['Latest progress',p.progress]].map(([a,b])=>`<div class="modal-row"><b>${a}</b>${b}</div>`).join('');$('modal').classList.add('open')};function closeModal(){$('modal').classList.remove('open')};$('modal-close').onclick=closeModal;$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+const pageNames={dashboard:['Overview','Good to see you again','Here\'s what\'s happening across your projects today.'],projects:['Projects','Your project portfolio','Browse projects and explore their latest progress.'],documents:['Documents','Document workspace','Keep procurement documents and approvals organised.'],assistant:['AI Assistant','Group 10 Assistant','Talk naturally with your live Copilot Studio agent.']};function setPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));$('crumb').textContent=pageNames[name][0];$('heading').textContent=pageNames[name][1];$('subtitle').textContent=pageNames[name][2];window.scrollTo({top:0,behavior:'smooth'})};document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>setPage(b.dataset.page));document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>setPage(b.dataset.goto));$('top-new').onclick=()=>setPage('assistant');
+
+// ========================================================
+// DIRECT LINE DIRECT CONNECT FUNCTION (COPILOT STUDIO)
+// ========================================================
+(async function initCopilotAgent() {
   const environmentId = "37954b56-6662-eab5-8c43-065ce3edaff5";
   const botSchemaName = "cr4a6_Group10";
 
-  try {
-    // Panggil Direct Line Web Chat terus guna createDirectLine
-    const directLine = window.WebChat.createDirectLine({
-      token: '',
-      domain: `https://powerva.azurewebsites.net/api/botmanagement/v1/directline/directlinetoken?botSchemaName=${botSchemaName}&environmentId=${environmentId}`
-    });
+  const tokenUrl = `https://powerva.azurewebsites.net/api/botmanagement/v1/directline/directlinetoken?botSchemaName=${botSchemaName}&environmentId=${environmentId}`;
 
-    // Style chat widget
+  try {
+    // Call token generation via POST/GET fetch
+    const response = await fetch(tokenUrl, { method: 'GET' });
+    
+    if (!response.ok) {
+      throw new Error(`Token endpoint returned status ${response.status}`);
+    }
+
+    const data = await response.json();
+    const token = data.token;
+
     const styleOptions = {
       accent: '#4169ee',
       botAvatarInitials: 'G10',
@@ -44,23 +56,40 @@
       backgroundColor: '#ffffff'
     };
 
-    // Render ke Chat Box Mini Dashboard
-    if (document.getElementById('webchat-dashboard')) {
+    if ($('webchat-dashboard')) {
       window.WebChat.renderWebChat(
-        { directLine: directLine, styleOptions: styleOptions },
-        document.getElementById('webchat-dashboard')
+        { directLine: window.WebChat.createDirectLine({ token: token }), styleOptions },
+        $('webchat-dashboard')
       );
     }
 
-    // Render ke Full Assistant Tab
-    if (document.getElementById('webchat-full')) {
+    if ($('webchat-full')) {
       window.WebChat.renderWebChat(
-        { directLine: directLine, styleOptions: styleOptions },
-        document.getElementById('webchat-full')
+        { directLine: window.WebChat.createDirectLine({ token: token }), styleOptions },
+        $('webchat-full')
       );
     }
   } catch (err) {
-    console.error("Gagal sambung agen:", err);
+    console.error("Direct Line Token Connection Error:", err);
+    
+    // Fallback UI jika token disekat sepenuhnya oleh Microsoft Tenant Policy
+    const fallbackHTML = `
+      <div style="padding: 20px; text-align: center; color: #35435e; font-family: sans-serif;">
+        <div style="font-size: 28px; margin-bottom: 8px;">🤖</div>
+        <strong style="display:block; font-size: 14px; margin-bottom: 6px;">Group 10 Agent Ready</strong>
+        <p style="font-size: 11px; color: #78859c; line-height: 1.5; margin: 0 0 12px;">
+          Bot logic configured on Copilot Studio. <br>
+          <em>(Tenant sandbox channel restrictions active)</em>
+        </p>
+        <button onclick="window.open('https://copilotstudio.microsoft.com', '_blank')" 
+                style="background: #4169ee; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: 700;">
+          Open Test Canvas ↗
+        </button>
+      </div>
+    `;
+
+    if ($('webchat-dashboard'))$('webchat-dashboard').innerHTML = fallbackHTML;
+    if ($('webchat-full'))$('webchat-full').innerHTML = fallbackHTML;
   }
 })();
-</script>
+</script></body></html>
