@@ -4,458 +4,1516 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ProjectPilot AI | Command Center</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0b1222">
+<title>ProjectPilot AI — Project Command Center</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
 :root {
-  --navy:#101b36;
-  --blue:#536df0;
-  --purple:#8a60f2;
+  --navy:#0b1222;
+  --navy2:#142442;
+  --blue:#476df1;
+  --purple:#8059ef;
+  --ink:#17233b;
+  --muted:#8290a7;
+  --line:#e8edf5;
   --bg:#f5f7fc;
-  --ink:#1d2942;
-  --muted:#8490a6;
-  --line:#e7ecf5;
+  --white:#fff;
 }
-* {box-sizing:border-box}
-body {margin:0;background:var(--bg);font:14px 'DM Sans',sans-serif;color:var(--ink)}
-button,input {font:inherit}
-button {cursor:pointer}
-button:focus-visible,input:focus-visible {outline:3px solid #aabaff;outline-offset:2px}
-.app {display:flex;min-height:100vh}
+
+* { box-sizing:border-box; }
+
+html,body {
+  margin:0;
+  min-height:100%;
+}
+
+body {
+  background:var(--bg);
+  color:var(--ink);
+  font:14px 'DM Sans',sans-serif;
+}
+
+button,input { font:inherit; }
+button { cursor:pointer; }
+button:focus-visible,input:focus-visible {
+  outline:3px solid #aabaff;
+  outline-offset:2px;
+}
+
+.app {
+  min-height:100vh;
+  display:flex;
+}
+
+/* SIDEBAR */
+
 .sidebar {
-  width:250px;background:var(--navy);color:#a8b7d2;
-  padding:28px 16px;display:flex;flex-direction:column;
-  position:sticky;top:0;height:100vh;flex-shrink:0
-}
-.brand {display:flex;gap:12px;align-items:center;margin:0 7px 40px}
-.logo,.ai-icon {
-  background:linear-gradient(135deg,#477cff,#9961f7);
-  color:white;display:grid;place-items:center;
-  border-radius:14px;width:44px;height:44px;font-size:24px
-}
-.brand strong {color:white;font:800 17px 'Plus Jakarta Sans'}
-.brand small {display:block;font-size:9px;letter-spacing:1.5px;margin-top:5px}
-.nav-title {font-size:10px;letter-spacing:1.7px;margin:0 15px 12px;color:#687d9f}
-.nav {display:grid;gap:7px}
-.nav button {
-  border:0;background:transparent;color:#a5b3cc;
-  padding:14px;border-radius:12px;text-align:left;font-weight:700
-}
-.nav button:hover,.nav button.active {
-  background:#293c69;color:white
-}
-.nav button.active {box-shadow:inset 3px 0 #8ea2ff}
-.nav button span {display:inline-block;width:27px;font-size:18px}
-.side-bottom {
-  margin-top:auto;border-top:1px solid #293750;
-  padding:20px 9px;font-size:11px;line-height:1.8
-}
-.main {flex:1;min-width:0;padding:30px clamp(20px,4vw,58px) 70px}
-.topbar {display:flex;justify-content:space-between;align-items:center;margin-bottom:34px}
-.breadcrumb {color:#8996aa;font-size:12px}
-.breadcrumb strong {color:#334363}
-.connected {
-  border:1px solid #d5ede2;background:#edf9f3;color:#168568;
-  padding:9px 13px;border-radius:25px;font-size:11px;font-weight:700
-}
-.connected:before {
-  content:"";display:inline-block;background:#1eb98a;
-  width:7px;height:7px;border-radius:50%;margin-right:8px
-}
-.heading {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:27px}
-.eyebrow {font-size:10px;font-weight:800;letter-spacing:2px;color:#6e70e5}
-h1 {font:800 clamp(24px,3vw,35px) 'Plus Jakarta Sans';letter-spacing:-1.2px;margin:10px 0}
-.subtitle {color:var(--muted);font-size:13px;margin:0}
-.primary {
-  background:linear-gradient(120deg,#486ff0,#805ce9);
-  color:white;border:0;padding:13px 19px;border-radius:12px;font-weight:800
-}
-.page {display:none}
-.page.active {display:block}
-.stats {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:23px}
-.stat,.card {
-  background:white;border:1px solid var(--line);
-  border-radius:18px;box-shadow:0 8px 25px #1e39600a
-}
-.stat {padding:22px}
-.stat-icon {font-size:23px;color:var(--blue);margin-bottom:17px}
-.stat strong {display:block;font:800 30px 'Plus Jakarta Sans'}
-.stat small {display:block;color:var(--muted);margin-top:6px}
-.cols {display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:22px;align-items:start}
-.card {padding:24px;margin-bottom:22px}
-.card-head {display:flex;justify-content:space-between;align-items:center;margin-bottom:19px;gap:10px}
-h2 {font:800 16px 'Plus Jakarta Sans';margin:0}
-.link {border:0;background:none;color:var(--blue);font-weight:800}
-.search {
-  width:100%;border:1px solid var(--line);background:#fafbff;
-  padding:13px;border-radius:11px;margin-bottom:8px
-}
-.project {
-  display:flex;align-items:center;gap:13px;padding:16px 0;
-  border-bottom:1px solid #eef1f7
-}
-.project:last-child {border:0}
-.project-icon {
-  width:41px;height:41px;background:#edf1ff;border-radius:12px;
-  display:grid;place-items:center;font-size:19px;flex-shrink:0
-}
-.project-info {flex:1;min-width:0}
-.project-info strong {display:block;font-size:12px}
-.project-info small {display:block;color:var(--muted);font-size:11px;margin-top:5px}
-.pill {
-  background:#eaf0ff;color:#5573d2;border-radius:30px;
-  padding:7px 10px;font-size:10px;font-weight:800;white-space:nowrap
-}
-.pill.pending {background:#fff2e4;color:#b78031}
-.pill.completed {background:#e7f8ee;color:#188a64}
-.activity {padding:13px 0;border-bottom:1px solid #edf0f6}
-.activity:last-child {border:0}
-.activity strong {font-size:12px}
-.activity small {display:block;color:var(--muted);margin-top:6px}
-.hero {
-  background:radial-gradient(circle at 100% 0%,#514996,transparent 65%),
-  linear-gradient(135deg,#111e3a,#1a315a);
-  border-radius:20px;color:white;padding:28px;margin-bottom:22px
-}
-.hero h2 {font-size:20px;margin:20px 0 10px}
-.hero p {color:#b6c6e2;font-size:12px;line-height:1.8}
-.hero .primary {background:white;color:#27375d;width:100%;margin-top:14px}
-.quick-grid {display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.quick {
-  background:#fbfcff;border:1px solid var(--line);
-  border-radius:12px;padding:16px;text-align:left;
-  color:#354461;font-weight:800;font-size:12px
-}
-.quick span {display:block;font-size:23px;margin-bottom:10px}
-.quick:hover {background:#f1f4ff}
-.note {color:#98a4b5;font-size:11px;line-height:1.7}
-.doc {padding:18px 0;border-bottom:1px solid var(--line)}
-.doc strong {display:block;font-size:13px}
-.doc small {display:block;color:var(--muted);margin-top:6px}
-.assistant-layout {display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:20px}
-.chat-shell {
-  background:white;border:1px solid var(--line);
-  border-radius:20px;overflow:hidden;box-shadow:0 10px 30px #1e39600a
-}
-.chat-header {
-  display:flex;align-items:center;gap:12px;
-  padding:17px 20px;border-bottom:1px solid var(--line)
-}
-.chat-header .ai-icon {width:39px;height:39px;font-size:20px}
-.chat-header strong {font-size:14px}
-.chat-header small {display:block;color:var(--muted);margin-top:5px}
-.chat-frame {height:650px;background:white}
-iframe {display:block;width:100%;height:100%;border:0}
-.tip {padding:14px;background:#fafbff;border:1px solid var(--line);border-radius:12px;margin-top:12px}
-.tip strong {display:block;font-size:12px}
-.tip small {display:block;color:var(--muted);margin-top:6px;line-height:1.6}
-.float-btn {
-  position:fixed;bottom:25px;right:25px;z-index:50;
-  width:63px;height:63px;border:0;border-radius:20px;
-  background:linear-gradient(135deg,#477aff,#9360f0);
-  color:white;font-size:27px;box-shadow:0 12px 32px #5267dc70
-}
-.popup {
-  display:none;
-  position:fixed;
-  right:25px;
-  bottom:90px;
-  width:520px;
-  max-width:calc(100vw - 30px);
-  height:calc(100vh - 110px);
-  background:white;
-  border:1px solid var(--line);
-  border-radius:20px;
-  overflow:hidden;
-  z-index:51;
-  box-shadow:0 25px 80px #101c3c55;
+  width:246px;
+  flex-shrink:0;
+  background:var(--navy);
+  color:#b2bdd1;
+  padding:29px 14px 22px;
+  position:sticky;
+  top:0;
+  height:100vh;
+  display:flex;
   flex-direction:column;
 }
-.popup.open {display:flex}
-.popup-header {
-  background:var(--navy);color:white;padding:17px;
-  display:flex;align-items:center;gap:12px
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:2px 10px 36px;
 }
-.popup-header .ai-icon {width:37px;height:37px;font-size:20px}
-.popup-header strong {font-size:13px}
-.popup-header small {display:block;color:#aabbd7;font-size:10px;margin-top:4px}
-.close {
-  margin-left:auto;background:#ffffff18;border:0;
-  color:white;border-radius:8px;padding:7px 11px
+
+.brand-mark {
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  background:linear-gradient(135deg,#477cff,#8c5cff);
+  display:grid;
+  place-items:center;
+  color:white;
+  font-size:24px;
+  box-shadow:0 8px 24px #4264e850;
 }
-.popup-body {flex:1;min-height:0}
+
+.brand-name {
+  color:white;
+  font:800 17px Manrope,sans-serif;
+  letter-spacing:-.6px;
+}
+
+.brand small {
+  display:block;
+  color:#8295b6;
+  font-size:9px;
+  letter-spacing:1.4px;
+  margin-top:5px;
+}
+
+.nav-caption {
+  font-size:10px;
+  color:#6d81a3;
+  letter-spacing:1.6px;
+  font-weight:800;
+  padding:0 15px 12px;
+}
+
+.nav {
+  display:grid;
+  gap:6px;
+}
+
+.nav button {
+  border:0;
+  background:transparent;
+  color:#a6b8d5;
+  border-radius:11px;
+  padding:13px 15px;
+  text-align:left;
+  font-size:13px;
+  font-weight:700;
+}
+
+.nav button:hover {
+  background:#1d2c49;
+  color:white;
+}
+
+.nav button.active {
+  background:#263c69;
+  color:white;
+  box-shadow:inset 3px 0 #7191ff;
+}
+
+.nav button span {
+  display:inline-block;
+  width:27px;
+  font-size:17px;
+}
+
+.sidebar-bottom {
+  margin-top:auto;
+  padding:17px 8px 0;
+  border-top:1px solid #293750;
+}
+
+.side-note {
+  background:#15243e;
+  border:1px solid #30415d;
+  border-radius:13px;
+  padding:15px;
+  font-size:11px;
+  line-height:1.8;
+}
+
+.side-note strong {
+  color:white;
+  display:block;
+  margin-bottom:6px;
+}
+
+.version {
+  color:#7284a3;
+  font-size:11px;
+  margin-top:15px;
+}
+
+/* MAIN */
+
+.main {
+  flex:1;
+  min-width:0;
+  padding:28px clamp(20px,3.3vw,56px) 70px;
+}
+
+.topbar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:34px;
+  gap:15px;
+}
+
+.breadcrumb {
+  font-size:12px;
+  color:#8b97aa;
+}
+
+.breadcrumb strong {
+  color:#344565;
+}
+
+.connection {
+  background:#edf8f3;
+  border:1px solid #d8eee3;
+  color:#18866b;
+  border-radius:30px;
+  padding:9px 13px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.connection:before {
+  content:"";
+  display:inline-block;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#1ca981;
+  margin-right:8px;
+}
+
+.welcome {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:25px;
+}
+
+.overline {
+  color:#5977e5;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1.8px;
+}
+
+h1 {
+  font:800 clamp(24px,2.8vw,34px) Manrope,sans-serif;
+  letter-spacing:-1.2px;
+  margin:10px 0 8px;
+}
+
+.subtitle {
+  color:var(--muted);
+  font-size:13px;
+  margin:0;
+}
+
+.btn {
+  border:0;
+  border-radius:11px;
+  padding:12px 18px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.btn-primary {
+  color:white;
+  background:linear-gradient(120deg,#4169ee,#7758ee);
+  box-shadow:0 8px 20px #4264e62a;
+}
+
+/* PAGES */
+
+.page { display:none; }
+.page.active { display:block; }
+
+/* STATS */
+
+.stats {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:17px;
+  margin-bottom:22px;
+}
+
+.stat {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:21px;
+  box-shadow:0 7px 22px #1c376508;
+}
+
+.stat-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.stat-icon {
+  width:39px;
+  height:39px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  font-size:18px;
+}
+
+.stat-icon.blue { background:#ecf1ff;color:#4869e6; }
+.stat-icon.purple { background:#f2edff;color:#855bea; }
+.stat-icon.orange { background:#fff4e9;color:#d88c32; }
+.stat-icon.green { background:#e9f8f1;color:#18a778; }
+
+.stat-note {
+  color:#94a0b2;
+  font-size:10px;
+}
+
+.stat strong {
+  font:800 29px Manrope,sans-serif;
+  display:block;
+}
+
+.stat label {
+  display:block;
+  color:#7988a0;
+  font-size:12px;
+  margin-top:5px;
+}
+
+/* CARDS */
+
+.columns {
+  display:grid;
+  grid-template-columns:minmax(0,1.65fr) minmax(320px,1fr);
+  gap:21px;
+  align-items:start;
+}
+
+.card {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:23px;
+  margin-bottom:21px;
+  box-shadow:0 7px 25px #1c376508;
+}
+
+.card-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.card h2 {
+  font:800 15px Manrope,sans-serif;
+  margin:0;
+}
+
+.subtle {
+  color:#8b97a9;
+  font-size:12px;
+}
+
+.text-btn {
+  background:none;
+  border:0;
+  color:#5271e9;
+  font-size:12px;
+  font-weight:800;
+}
+
+.search {
+  width:100%;
+  border:1px solid #e6ebf3;
+  border-radius:10px;
+  background:#fbfcff;
+  padding:12px 13px;
+  color:#293953;
+  margin-bottom:7px;
+}
+
+/* PROJECT LIST */
+
+.project {
+  display:flex;
+  align-items:center;
+  gap:13px;
+  border-bottom:1px solid #eef1f7;
+  padding:15px 2px;
+  cursor:pointer;
+}
+
+.project:last-child { border:0; }
+.project:hover { background:#f9fbff; }
+
+.project-symbol {
+  width:39px;
+  height:39px;
+  flex-shrink:0;
+  border-radius:12px;
+  background:#eff2ff;
+  display:grid;
+  place-items:center;
+  font-size:17px;
+}
+
+.project-info {
+  min-width:0;
+  flex:1;
+}
+
+.project-info strong {
+  display:block;
+  font-size:12.5px;
+  margin-bottom:5px;
+}
+
+.project-info small {
+  color:#8995a8;
+  font-size:11px;
+  line-height:1.6;
+}
+
+.status {
+  border-radius:20px;
+  padding:7px 10px;
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+  background:#eaf1ff;
+  color:#5075d7;
+}
+
+.status.pending {
+  background:#fff3e5;
+  color:#b47c31;
+}
+
+.status.completed {
+  background:#e5f8ee;
+  color:#168d65;
+}
+
+/* ACTIVITY */
+
+.activity {
+  padding:13px 0;
+  border-bottom:1px solid #f0f2f7;
+}
+
+.activity:last-child { border:0; }
+
+.activity strong { font-size:12px; }
+
+.activity p {
+  color:#8d99ac;
+  font-size:11px;
+  margin:6px 0 0;
+}
+
+/* AI CARD */
+
+.ai-card {
+  background:
+    radial-gradient(circle at 100% 0%,#3b377c 0%,transparent 55%),
+    linear-gradient(145deg,#111e38,#162b50);
+  color:white;
+  border:1px solid #283d61;
+}
+
+.ai-orb {
+  width:46px;
+  height:46px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  color:white;
+  background:linear-gradient(135deg,#4778f9,#9c62ff);
+  font-size:24px;
+  margin-bottom:17px;
+}
+
+.ai-card h2 { color:white; }
+
+.ai-card p {
+  color:#b1c0d9;
+  line-height:1.7;
+  font-size:12px;
+  margin:12px 0 20px;
+}
+
+.ai-card .btn { width:100%; }
+
+/* QUICK ACTIONS */
+
+.quick-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.quick-action {
+  border:1px solid #e9edf5;
+  background:#fbfcff;
+  border-radius:12px;
+  padding:15px 12px;
+  text-align:left;
+  font-size:12px;
+  font-weight:700;
+  color:#35435e;
+}
+
+.quick-action span {
+  display:block;
+  font-size:20px;
+  margin-bottom:10px;
+}
+
+.quick-action:hover {
+  border-color:#acbbfa;
+  background:#f5f7ff;
+}
+
+/* DOCUMENTS */
+
+.doc-item {
+  display:flex;
+  gap:14px;
+  align-items:center;
+  padding:18px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.doc-icon { font-size:23px; }
+
+.doc-item strong { font-size:13px; }
+
+.doc-item p {
+  font-size:11px;
+  color:var(--muted);
+  margin:6px 0 0;
+}
+
+.doc-item .status { margin-left:auto; }
+
+/* FULL AI WORKSPACE */
+
+.assistant-layout {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 250px;
+  gap:20px;
+  align-items:start;
+}
+
+.assistant-shell {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:19px;
+  overflow:hidden;
+  box-shadow:0 10px 30px #1c376510;
+}
+
+.assistant-header {
+  padding:18px 20px;
+  display:flex;
+  align-items:center;
+  gap:13px;
+  border-bottom:1px solid var(--line);
+}
+
+.assistant-header strong {
+  font-size:14px;
+}
+
+.assistant-header small {
+  display:block;
+  color:var(--muted);
+  margin-top:5px;
+  font-size:11px;
+}
+
+.assistant-header .ai-orb {
+  width:39px;
+  height:39px;
+  margin:0;
+  font-size:19px;
+}
+
+.full-chat {
+  height:calc(100dvh - 245px);
+  min-height:560px;
+  background:white;
+}
+
+.tip {
+  padding:15px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.tip strong {
+  display:block;
+  font-size:12px;
+}
+
+.tip small {
+  display:block;
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.7;
+  margin-top:6px;
+}
+
+.demo-note {
+  color:#91a0b2;
+  font-size:11px;
+  line-height:1.7;
+  margin-top:15px;
+}
+
+/* PROJECT DETAILS MODAL */
+
+.modal-backdrop {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#0912259c;
+  z-index:80;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.modal-backdrop.open { display:flex; }
+
+.modal {
+  background:white;
+  border-radius:19px;
+  padding:28px;
+  max-width:510px;
+  width:100%;
+  box-shadow:0 25px 70px #081a3860;
+}
+
+.modal h2 { margin:0 0 10px; }
+
+.modal p {
+  color:var(--muted);
+  font-size:13px;
+}
+
+.modal-row {
+  padding:11px 0;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+}
+
+.modal-row b {
+  display:inline-block;
+  width:145px;
+}
+
+.modal-actions {
+  display:flex;
+  justify-content:flex-end;
+  margin-top:22px;
+}
+
+/* =========================================
+   LARGE FLOATING AI CHAT
+   ========================================= */
+
+.copilot-trigger-btn {
+  position:fixed;
+  right:25px;
+  bottom:24px;
+  width:64px;
+  height:64px;
+  border:0;
+  border-radius:19px;
+  background:linear-gradient(135deg,#477cff,#8c5cff);
+  color:white;
+  font-size:27px;
+  box-shadow:0 10px 30px #4264e870;
+  z-index:1001;
+}
+
+.copilot-trigger-btn:hover {
+  transform:translateY(-2px);
+}
+
+/* MAIN POPUP SIZE */
+.copilot-chat-popup {
+  display:none;
+  position:fixed;
+
+  /* Width */
+  width:560px;
+  max-width:calc(100vw - 24px);
+
+  /* Height - almost full screen */
+  height:calc(100dvh - 100px);
+  max-height:none;
+
+  /* Position */
+  top:12px;
+  right:18px;
+  bottom:auto;
+
+  background:white;
+  border:1px solid #dce4f0;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 24px 75px #0b183b50;
+  z-index:1000;
+  flex-direction:column;
+}
+
+.copilot-chat-popup.open {
+  display:flex;
+}
+
+/* Expanded chat */
+.copilot-chat-popup.expanded {
+  width:min(950px,calc(100vw - 36px));
+}
+
+.copilot-popup-header {
+  flex-shrink:0;
+  background:linear-gradient(135deg,#101c36,#1b3159);
+  color:white;
+  padding:15px 18px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:70px;
+}
+
+.copilot-popup-header .ai-orb {
+  width:39px;
+  height:39px;
+  margin:0;
+  flex-shrink:0;
+  font-size:19px;
+}
+
+.copilot-popup-title {
+  min-width:0;
+  flex:1;
+}
+
+.copilot-popup-title strong {
+  display:block;
+  font-size:14px;
+}
+
+.copilot-popup-title small {
+  display:block;
+  color:#a9bbd8;
+  margin-top:5px;
+  font-size:10px;
+}
+
+.copilot-popup-controls {
+  display:flex;
+  gap:7px;
+}
+
+.copilot-popup-controls button {
+  border:1px solid #ffffff2b;
+  background:#ffffff13;
+  color:white;
+  border-radius:9px;
+  min-width:34px;
+  height:34px;
+  font-size:17px;
+}
+
+.copilot-popup-controls button:hover {
+  background:#ffffff28;
+}
+
+.copilot-popup-body {
+  flex:1;
+  min-height:0;
+  width:100%;
+  background:white;
+}
+
+/* IFRAMES */
+
+.copilot-popup-body iframe,
+.full-chat iframe {
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+  background:white;
+}
+
+/* RESPONSIVE */
+
 @media(max-width:1150px) {
-  .cols {grid-template-columns:1fr}
-  .assistant-layout {grid-template-columns:1fr}
-  .tips {display:none}
+  .sidebar { width:210px; }
+  .main { padding:25px; }
+  .columns { grid-template-columns:1fr; }
+  .stats { grid-template-columns:repeat(2,1fr); }
+  .assistant-layout { grid-template-columns:1fr; }
+  .assistant-tips { display:none; }
 }
-@media(max-width:850px) {
-  .sidebar {width:210px}
-  .stats {grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:620px) {
-  .app {display:block}
-  .sidebar {width:100%;height:auto;position:static;padding:15px}
-  .brand {margin-bottom:16px}
-  .nav-title,.side-bottom {display:none}
-  .nav {display:flex;overflow-x:auto}
-  .nav button {white-space:nowrap;padding:11px}
-  .main {padding:22px 15px 80px}
-  .heading {align-items:flex-start;flex-direction:column}
-  .stats {gap:10px}
-  .stat {padding:15px}
-  .stat strong {font-size:24px}
-  .card {padding:17px}
-  .connected {font-size:9px}
-  .popup {right:10px;bottom:86px;max-width:calc(100vw - 20px)}
-  .float-btn {right:15px;bottom:15px}
-  .chat-frame {height:65vh}
+
+@media(max-width:680px) {
+  .app { display:block; }
+
+  .sidebar {
+    width:100%;
+    height:auto;
+    position:static;
+    padding:15px;
+  }
+
+  .brand { padding:0 4px 15px; }
+  .nav-caption,.sidebar-bottom { display:none; }
+
+  .nav {
+    display:flex;
+    overflow-x:auto;
+  }
+
+  .nav button {
+    white-space:nowrap;
+    padding:10px;
+  }
+
+  .main { padding:20px 14px 80px; }
+  .topbar { margin-bottom:25px; }
+
+  .welcome {
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .stats { gap:10px; }
+  .stat { padding:15px; }
+  .stat strong { font-size:25px; }
+  .card { padding:17px; }
+
+  .copilot-chat-popup,
+  .copilot-chat-popup.expanded {
+    top:8px;
+    right:8px;
+    width:calc(100vw - 16px);
+    max-width:none;
+    height:calc(100dvh - 88px);
+    border-radius:16px;
+  }
+
+  .copilot-trigger-btn {
+    right:15px;
+    bottom:13px;
+  }
+
+  .full-chat {
+    height:65dvh;
+    min-height:420px;
+  }
 }
 </style>
 </head>
+
 <body>
 
 <div class="app">
+
   <aside class="sidebar">
     <div class="brand">
-      <div class="logo">✦</div>
+      <div class="brand-mark">✦</div>
       <div>
-        <strong>ProjectPilot AI</strong>
+        <div class="brand-name">ProjectPilot AI</div>
         <small>PROJECT COMMAND CENTER</small>
       </div>
     </div>
-    <div class="nav-title">WORKSPACE</div>
+
+    <div class="nav-caption">WORKSPACE</div>
+
     <nav class="nav">
-      <button class="active" data-page="dashboard"><span>◫</span> Overview</button>
-      <button data-page="projects"><span>▤</span> Projects</button>
-      <button data-page="documents"><span>▧</span> Documents</button>
-      <button data-page="assistant"><span>✦</span> AI Assistant</button>
+      <button class="active" data-page="dashboard">
+        <span>◫</span> Overview
+      </button>
+      <button data-page="projects">
+        <span>▤</span> Projects
+      </button>
+      <button data-page="documents">
+        <span>▧</span> Documents
+      </button>
+      <button data-page="assistant">
+        <span>✦</span> AI Assistant
+      </button>
     </nav>
-    <div class="side-bottom">
-      <strong>✧ Your intelligent workspace</strong>
-      <p>Projects, documents and AI assistance in one place.</p>
-      ProjectPilot AI · v3.0
+
+    <div class="sidebar-bottom">
+      <div class="side-note">
+        <strong>✧ Built for smarter work</strong>
+        Your projects, documents and AI assistance in one connected workspace.
+      </div>
+      <div class="version">ProjectPilot AI · v3.1</div>
     </div>
   </aside>
 
   <main class="main">
+
     <div class="topbar">
-      <div class="breadcrumb">Workspace / <strong id="crumb">Overview</strong></div>
-      <div class="connected">Group 10 configured</div>
+      <div class="breadcrumb">
+        Workspace / <strong id="crumb">Overview</strong>
+      </div>
+      <div class="connection">Group 10 configured</div>
     </div>
 
-    <div class="heading">
+    <div class="welcome">
       <div>
-        <div class="eyebrow">YOUR PROJECT WORKSPACE</div>
-        <h1 id="heading">Your projects, in focus ✦</h1>
-        <p class="subtitle" id="subtitle">Manage projects and work alongside your AI assistant.</p>
+        <div class="overline">YOUR PROJECT WORKSPACE</div>
+        <h1 id="heading">
+          Good to see you again
+          <span style="color:#5270ed">✦</span>
+        </h1>
+        <p class="subtitle" id="subtitle">
+          Here's what's happening across your projects today.
+        </p>
       </div>
-      <button class="primary" data-chat>＋ New Project</button>
+      <button class="btn btn-primary" id="top-new">
+        ＋ New Project
+      </button>
     </div>
+
+    <!-- DASHBOARD -->
 
     <section class="page active" id="page-dashboard">
+
       <div class="stats">
-        <div class="stat"><div class="stat-icon">▦</div><strong>12</strong><small>Total projects</small></div>
-        <div class="stat"><div class="stat-icon">↗</div><strong>8</strong><small>Active projects</small></div>
-        <div class="stat"><div class="stat-icon">▤</div><strong>3</strong><small>Pending RFQs</small></div>
-        <div class="stat"><div class="stat-icon">◷</div><strong>2</strong><small>Upcoming deadlines</small></div>
+
+        <div class="stat">
+          <div class="stat-top">
+            <div class="stat-icon blue">▦</div>
+            <span class="stat-note">Portfolio</span>
+          </div>
+          <strong>12</strong>
+          <label>Total projects</label>
+        </div>
+
+        <div class="stat">
+          <div class="stat-top">
+            <div class="stat-icon purple">↗</div>
+            <span class="stat-note">In progress</span>
+          </div>
+          <strong>8</strong>
+          <label>Active projects</label>
+        </div>
+
+        <div class="stat">
+          <div class="stat-top">
+            <div class="stat-icon orange">▤</div>
+            <span class="stat-note">Needs attention</span>
+          </div>
+          <strong>3</strong>
+          <label>Pending RFQs</label>
+        </div>
+
+        <div class="stat">
+          <div class="stat-top">
+            <div class="stat-icon green">◷</div>
+            <span class="stat-note">Next 30 days</span>
+          </div>
+          <strong>2</strong>
+          <label>Upcoming deadlines</label>
+        </div>
+
       </div>
 
-      <div class="cols">
+      <div class="columns">
+
         <div>
+
           <section class="card">
             <div class="card-head">
-              <h2>Project Portfolio</h2>
-              <button class="link" data-goto="projects">View all →</button>
+              <h2>Project portfolio</h2>
+              <button class="text-btn" data-goto="projects">
+                View all →
+              </button>
             </div>
-            <input class="search" id="dash-search" placeholder="⌕ Search projects...">
+
+            <input
+              class="search"
+              id="dash-search"
+              placeholder="⌕ Search by project, owner or progress"
+            >
+
             <div id="dash-list"></div>
-            <p class="note">Sample project data. Live Dataverse dashboard is not connected yet.</p>
           </section>
 
           <section class="card">
-            <div class="card-head"><h2>Recent Activity</h2><span class="note">Sample events</span></div>
-            <div class="activity"><strong>▤ RFQ draft prepared</strong><small>Office Renovation · Document preparation</small></div>
-            <div class="activity"><strong>↗ Progress update recorded</strong><small>Cafe at Main Branch · Pending RFQ</small></div>
-            <div class="activity"><strong>▧ Document uploaded</strong><small>Walkie-Talkie Procurement</small></div>
+            <div class="card-head">
+              <h2>Recent activity</h2>
+              <span class="subtle">Sample events</span>
+            </div>
+
+            <div class="activity">
+              <strong>▤ RFQ draft prepared</strong>
+              <p>Office Renovation · Document preparation</p>
+            </div>
+
+            <div class="activity">
+              <strong>↗ Progress update recorded</strong>
+              <p>Cafe at Main Branch · Pending RFQ</p>
+            </div>
+
+            <div class="activity">
+              <strong>▧ Document uploaded</strong>
+              <p>Walkie-Talkie Procurement · Procurement file</p>
+            </div>
           </section>
+
         </div>
 
         <div>
-          <section class="hero">
-            <div class="ai-icon">✦</div>
-            <h2>Meet your AI Co-Pilot</h2>
-            <p>Your Group 10 assistant helps you manage projects, check progress, register new projects and prepare procurement documents.</p>
-            <button class="primary" data-goto="assistant">✦ Open AI Workspace →</button>
+
+          <section class="card ai-card">
+            <div class="ai-orb">✦</div>
+            <h2>Meet your AI project co-pilot</h2>
+            <p>
+              Your Group 10 Assistant can help you check
+              project progress, register projects, prepare RFQs
+              and work with project documents.
+            </p>
+            <button class="btn btn-primary" data-goto="assistant">
+              Open AI Workspace →
+            </button>
           </section>
 
           <section class="card">
-            <div class="card-head"><h2>Quick Actions</h2></div>
+            <div class="card-head">
+              <h2>Quick actions</h2>
+            </div>
+
             <div class="quick-grid">
-              <button class="quick" data-chat><span>✚</span>Register Project</button>
-              <button class="quick" data-chat><span>▤</span>Prepare RFQ</button>
-              <button class="quick" data-chat><span>▧</span>Find Document</button>
-              <button class="quick" data-chat><span>↗</span>Record Update</button>
+              <button class="quick-action" data-chat>
+                <span>✚</span>Register project
+              </button>
+              <button class="quick-action" data-chat>
+                <span>▤</span>Prepare RFQ
+              </button>
+              <button class="quick-action" data-chat>
+                <span>▧</span>Find document
+              </button>
+              <button class="quick-action" data-chat>
+                <span>↗</span>Record update
+              </button>
             </div>
           </section>
+
         </div>
       </div>
     </section>
+
+    <!-- PROJECTS -->
 
     <section class="page" id="page-projects">
-      <div class="card">
-        <div class="card-head"><h2>All Projects</h2><span class="note">Sample portfolio</span></div>
-        <input class="search" id="all-search" placeholder="⌕ Search projects...">
-        <div id="all-list"></div>
-      </div>
-    </section>
-
-    <section class="page" id="page-documents">
-      <div class="card">
-        <div class="card-head"><h2>Document Workspace</h2><span class="note">Preview</span></div>
-        <div class="doc"><strong>📄 Request for Quotation (RFQ)</strong><small>Prepare and manage procurement requirements</small></div>
-        <div class="doc"><strong>📑 Business Case / Approval Papers</strong><small>Generate and review approval documents</small></div>
-        <div class="doc"><strong>📁 Project Document Library</strong><small>Retrieve documents through SharePoint</small></div>
-      </div>
-    </section>
-
-    <section class="page" id="page-assistant">
-      <div class="assistant-layout">
-        <div class="chat-shell">
-          <div class="chat-header">
-            <div class="ai-icon">✦</div>
-            <div>
-              <strong>Group 10 · Project Assistant</strong>
-              <small>Connected through Copilot Studio webchat</small>
-            </div>
-          </div>
-          <div class="chat-frame" id="full-chat"></div>
+      <section class="card">
+        <div class="card-head">
+          <h2>All projects</h2>
+          <span class="subtle">Sample portfolio</span>
         </div>
 
-        <aside class="card tips">
+        <input
+          class="search"
+          id="all-search"
+          placeholder="⌕ Search projects..."
+        >
+
+        <div id="all-list"></div>
+      </section>
+    </section>
+
+    <!-- DOCUMENTS -->
+
+    <section class="page" id="page-documents">
+      <section class="card">
+        <div class="card-head">
+          <h2>Document workspace</h2>
+          <span class="subtle">Preview</span>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon">📄</div>
+          <div>
+            <strong>Request for Quotation (RFQ)</strong>
+            <p>Prepare and manage procurement requirements</p>
+          </div>
+          <span class="status">Planned</span>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon">📑</div>
+          <div>
+            <strong>Business Case / Approval Papers</strong>
+            <p>Generate and review approval documents</p>
+          </div>
+          <span class="status">Planned</span>
+        </div>
+
+        <div class="doc-item">
+          <div class="doc-icon">📁</div>
+          <div>
+            <strong>Project Document Library</strong>
+            <p>Retrieve documents through SharePoint</p>
+          </div>
+          <span class="status">Planned</span>
+        </div>
+
+      </section>
+    </section>
+
+    <!-- AI ASSISTANT -->
+
+    <section class="page" id="page-assistant">
+
+      <div class="assistant-layout">
+
+        <div class="assistant-shell">
+          <div class="assistant-header">
+            <div class="ai-orb">✦</div>
+            <div>
+              <strong>Group 10 Project Assistant</strong>
+              <small>Copilot Studio · AI Workspace</small>
+            </div>
+          </div>
+
+          <div class="full-chat" id="full-chat"></div>
+        </div>
+
+        <div class="card assistant-tips">
           <h2>What can I help with?</h2>
-          <div class="tip"><strong>↗ Project Status</strong><small>Check active projects and latest progress.</small></div>
-          <div class="tip"><strong>✚ New Project</strong><small>Register projects using your workflow.</small></div>
-          <div class="tip"><strong>▤ Procurement</strong><small>Prepare RFQs and supporting documents.</small></div>
-          <p class="note">This chat uses your existing Group 10 agent.</p>
-        </aside>
+
+          <div class="tip">
+            <strong>↗ Project Status</strong>
+            <small>Check active projects and latest progress.</small>
+          </div>
+
+          <div class="tip">
+            <strong>✚ Project Registration</strong>
+            <small>Register a new project using Group 10.</small>
+          </div>
+
+          <div class="tip">
+            <strong>▤ Procurement</strong>
+            <small>Prepare RFQs and project documents.</small>
+          </div>
+
+          <p class="demo-note">
+            Chat is powered by your existing Group 10 agent.
+          </p>
+        </div>
+
       </div>
     </section>
+
   </main>
 </div>
 
-<button class="float-btn" id="float-btn" aria-label="Open AI chat">✦</button>
+<!-- FLOATING CHAT BUTTON -->
 
-<div class="popup" id="popup">
-  <div class="popup-header">
-    <div class="ai-icon">✦</div>
-    <div>
+<button
+  class="copilot-trigger-btn"
+  id="copilot-btn"
+  aria-label="Open Group 10 Assistant"
+  aria-expanded="false"
+  aria-controls="copilot-popup"
+>
+  ✦
+</button>
+
+<!-- LARGE CHAT POPUP -->
+
+<div
+  class="copilot-chat-popup"
+  id="copilot-popup"
+  role="dialog"
+  aria-label="Group 10 Assistant"
+>
+
+  <div class="copilot-popup-header">
+
+    <div class="ai-orb">✦</div>
+
+    <div class="copilot-popup-title">
       <strong>Group 10 Assistant</strong>
       <small>Copilot Studio · ProjectPilot AI</small>
     </div>
-    <button class="close" id="close-btn">✕</button>
+
+    <div class="copilot-popup-controls">
+      <button
+        id="expand-chat"
+        title="Expand chat"
+        aria-label="Expand chat"
+      >⛶</button>
+
+      <button
+        id="close-chat"
+        title="Close chat"
+        aria-label="Close chat"
+      >✕</button>
+    </div>
+
   </div>
-  <div class="popup-body" id="popup-chat"></div>
+
+  <div
+    class="copilot-popup-body"
+    id="popup-chat"
+  ></div>
+
+</div>
+
+<!-- PROJECT MODAL -->
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h2 id="modal-title"></h2>
+    <p id="modal-intro"></p>
+    <div id="modal-details"></div>
+    <div class="modal-actions">
+      <button class="btn" id="modal-close">Close</button>
+    </div>
+  </div>
 </div>
 
 <script>
-// Existing Group 10 connection from your working Gemini version.
+
+/* ==========================================
+   GROUP 10 CONNECTION
+   Kept from the working Gemini integration
+   ========================================== */
+
 const envId = "37954b56-6662-eab5-8c43-065ce3edaff5";
 const botName = "cr4a6_Group10";
-const embedUrl = `https://copilotstudio.microsoft.com/environments/${envId}/bots/${botName}/webchat?__profile__=pva`;
+
+const embedUrl =
+  `https://copilotstudio.microsoft.com/environments/${envId}/bots/${botName}/webchat?__profile__=pva`;
 
 const $ = id => document.getElementById(id);
 
+/* ==========================================
+   SAMPLE PROJECT DATA
+   ========================================== */
+
 const projects = [
-  {name:"Cafe at Main Branch",owner:"Facilities Team",status:"Active",icon:"☕"},
-  {name:"Office Renovation",owner:"Administration",status:"Active",icon:"▦"},
-  {name:"Walkie-Talkie Procurement",owner:"Safety Team",status:"Pending RFQ",icon:"◉"},
-  {name:"Document Digitisation",owner:"Operations",status:"Completed",icon:"▧"}
+  {
+    name:"Cafe at Main Branch",
+    owner:"Facilities Team",
+    status:"Active",
+    date:"25 Dec 2026",
+    progress:"Pending RFQ",
+    symbol:"☕"
+  },
+  {
+    name:"Office Renovation",
+    owner:"Administration",
+    status:"Active",
+    date:"30 Nov 2026",
+    progress:"Planning",
+    symbol:"▦"
+  },
+  {
+    name:"Walkie-Talkie Procurement",
+    owner:"Safety Team",
+    status:"Pending RFQ",
+    date:"15 Dec 2026",
+    progress:"RFQ Preparation",
+    symbol:"◉"
+  },
+  {
+    name:"Document Digitisation",
+    owner:"Operations",
+    status:"Completed",
+    date:"30 Sep 2026",
+    progress:"Completed",
+    symbol:"▧"
+  }
 ];
 
 function renderProjects(target,query="") {
-  const rows = projects.filter(p =>
-    (p.name+" "+p.owner+" "+p.status).toLowerCase().includes(query.toLowerCase())
+
+  const results = projects.filter(p =>
+    [
+      p.name,
+      p.owner,
+      p.status,
+      p.progress
+    ].join(" ").toLowerCase().includes(query.toLowerCase())
   );
-  $(target).innerHTML = rows.map(p => `
-    <div class="project">
-      <div class="project-icon">${p.icon}</div>
-      <div class="project-info">
-        <strong>${p.name}</strong>
-        <small>${p.owner}</small>
+
+  $(target).innerHTML = results.length
+    ? results.map(p => `
+      <div
+        class="project"
+        role="button"
+        tabindex="0"
+        data-project="${projects.indexOf(p)}"
+      >
+        <div class="project-symbol">${p.symbol}</div>
+
+        <div class="project-info">
+          <strong>${p.name}</strong>
+          <small>
+            ${p.owner} · ${p.progress} · ${p.date}
+          </small>
+        </div>
+
+        <span class="status ${
+          p.status==="Pending RFQ" ? "pending" :
+          p.status==="Completed" ? "completed" : ""
+        }">
+          ${p.status}
+        </span>
       </div>
-      <span class="pill ${p.status==="Pending RFQ"?"pending":p.status==="Completed"?"completed":""}">${p.status}</span>
-    </div>
-  `).join("") || '<p class="note">No matching projects.</p>';
+    `).join("")
+    : '<p class="demo-note">No matching projects.</p>';
+
+  $(target).querySelectorAll("[data-project]").forEach(el => {
+    el.onclick = () => openProject(Number(el.dataset.project));
+    el.onkeydown = e => {
+      if(e.key==="Enter") el.click();
+    };
+  });
 }
 
 renderProjects("dash-list");
 renderProjects("all-list");
 
-$("dash-search").oninput = e => renderProjects("dash-list",e.target.value);
-$("all-search").oninput = e => renderProjects("all-list",e.target.value);
+$("dash-search").oninput = e =>
+  renderProjects("dash-list",e.target.value);
+
+$("all-search").oninput = e =>
+  renderProjects("all-list",e.target.value);
+
+/* ==========================================
+   PROJECT DETAILS
+   ========================================== */
+
+function openProject(index) {
+
+  const p = projects[index];
+
+  $("modal-title").textContent = p.name;
+  $("modal-intro").textContent =
+    "Sample project record — not connected to Dataverse.";
+
+  $("modal-details").innerHTML = [
+    ["Project owner",p.owner],
+    ["Project status",p.status],
+    ["Target completion",p.date],
+    ["Latest progress",p.progress]
+  ].map(([a,b]) => `
+    <div class="modal-row">
+      <b>${a}</b>${b}
+    </div>
+  `).join("");
+
+  $("modal").classList.add("open");
+}
+
+function closeModal() {
+  $("modal").classList.remove("open");
+}
+
+$("modal-close").onclick = closeModal;
+
+$("modal").onclick = e => {
+  if(e.target === $("modal")) closeModal();
+};
+
+/* ==========================================
+   NAVIGATION
+   ========================================== */
 
 const pageInfo = {
-  dashboard:["Overview","Your projects, in focus","Manage projects and work alongside your AI assistant."],
-  projects:["Projects","Project portfolio","Browse your project workspace."],
-  documents:["Documents","Document workspace","Manage procurement and project documents."],
-  assistant:["AI Assistant","Your AI co-pilot","Talk directly with Group 10."]
+  dashboard:[
+    "Overview",
+    "Good to see you again",
+    "Here's what's happening across your projects today."
+  ],
+  projects:[
+    "Projects",
+    "Your project portfolio",
+    "Browse projects and explore their latest progress."
+  ],
+  documents:[
+    "Documents",
+    "Document workspace",
+    "Keep procurement documents and approvals organised."
+  ],
+  assistant:[
+    "AI Assistant",
+    "Your AI project co-pilot",
+    "Talk naturally with Group 10."
+  ]
 };
 
 function setPage(name) {
-  document.querySelectorAll(".page").forEach(p =>
-    p.classList.toggle("active",p.id==="page-"+name)
-  );
-  document.querySelectorAll(".nav button").forEach(b =>
-    b.classList.toggle("active",b.dataset.page===name)
-  );
-  $("crumb").textContent=pageInfo[name][0];
-  $("heading").textContent=pageInfo[name][1];
-  $("subtitle").textContent=pageInfo[name][2];
-  if(name==="assistant") loadChat("full-chat");
+
+  document.querySelectorAll(".page").forEach(p => {
+    p.classList.toggle(
+      "active",
+      p.id === "page-" + name
+    );
+  });
+
+  document.querySelectorAll(".nav button").forEach(b => {
+    b.classList.toggle(
+      "active",
+      b.dataset.page === name
+    );
+  });
+
+  $("crumb").textContent = pageInfo[name][0];
+  $("heading").textContent = pageInfo[name][1];
+  $("subtitle").textContent = pageInfo[name][2];
+
+  if(name === "assistant") {
+    loadChat("full-chat");
+  }
+
   window.scrollTo(0,0);
 }
 
-document.querySelectorAll("[data-page]").forEach(b =>
-  b.onclick=()=>setPage(b.dataset.page)
-);
-document.querySelectorAll("[data-goto]").forEach(b =>
-  b.onclick=()=>setPage(b.dataset.goto)
-);
+document.querySelectorAll("[data-page]").forEach(b => {
+  b.onclick = () => setPage(b.dataset.page);
+});
 
-function loadChat(id) {
-  const container=$(id);
+document.querySelectorAll("[data-goto]").forEach(b => {
+  b.onclick = () => setPage(b.dataset.goto);
+});
+
+/* ==========================================
+   LOAD COPILOT IFRAME
+   ========================================== */
+
+function loadChat(containerId) {
+
+  const container = $(containerId);
+
   if(container.querySelector("iframe")) return;
-  const frame=document.createElement("iframe");
-  frame.src=embedUrl;
-  frame.title="Group 10 Copilot Studio";
-  frame.setAttribute("allow","clipboard-write");
-  container.appendChild(frame);
+
+  const iframe = document.createElement("iframe");
+
+  iframe.src = embedUrl;
+  iframe.title = "Group 10 Copilot Studio Agent";
+  iframe.setAttribute("allow","clipboard-write");
+
+  container.appendChild(iframe);
 }
 
+/* ==========================================
+   FLOATING CHAT
+   ========================================== */
+
 function openChat() {
-  $("popup").classList.add("open");
-  $("float-btn").textContent="✕";
+
+  $("copilot-popup").classList.add("open");
+
+  $("copilot-btn").textContent = "✕";
+  $("copilot-btn").setAttribute("aria-expanded","true");
+
   loadChat("popup-chat");
 }
 
 function closeChat() {
-  $("popup").classList.remove("open");
-  $("float-btn").textContent="✦";
+
+  $("copilot-popup").classList.remove("open");
+
+  $("copilot-btn").textContent = "✦";
+  $("copilot-btn").setAttribute("aria-expanded","false");
 }
 
-$("float-btn").onclick=() =>
-  $("popup").classList.contains("open") ? closeChat() : openChat();
+function toggleChat() {
 
-$("close-btn").onclick=closeChat;
+  if($("copilot-popup").classList.contains("open")) {
+    closeChat();
+  } else {
+    openChat();
+  }
+}
 
-document.querySelectorAll("[data-chat]").forEach(b =>
-  b.onclick=openChat
-);
+$("copilot-btn").onclick = toggleChat;
+$("close-chat").onclick = closeChat;
+$("top-new").onclick = openChat;
 
-document.addEventListener("keydown",e=>{
-  if(e.key==="Escape") closeChat();
+document.querySelectorAll("[data-chat]").forEach(b => {
+  b.onclick = openChat;
 });
+
+/* ==========================================
+   EXPAND CHAT BUTTON
+   ========================================== */
+
+$("expand-chat").onclick = () => {
+
+  const popup = $("copilot-popup");
+
+  popup.classList.toggle("expanded");
+
+  const expanded = popup.classList.contains("expanded");
+
+  $("expand-chat").textContent = expanded ? "❐" : "⛶";
+  $("expand-chat").title = expanded
+    ? "Restore chat size"
+    : "Expand chat";
+  $("expand-chat").setAttribute(
+    "aria-label",
+    expanded ? "Restore chat size" : "Expand chat"
+  );
+};
+
+/* ==========================================
+   KEYBOARD
+   ========================================== */
+
+document.addEventListener("keydown",e => {
+  if(e.key === "Escape") {
+    closeChat();
+    closeModal();
+  }
+});
+
 </script>
+
 </body>
 </html>
