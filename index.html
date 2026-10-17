@@ -1293,6 +1293,12 @@ if ($("global-search")) {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeChat();
 });
+
+// ===== LETAK KOD AUTO-REFRESH 3 SAAT KAT SINI =====
+   setInterval(() => {
+     fetchLiveProjects();
+   }, 3000);
+  
 </script>
 
 </body>
