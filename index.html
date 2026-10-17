@@ -1154,7 +1154,7 @@ async function fetchLiveProjects() {
         }
 
         return {
-          name: row.cr4a6_project || row.cr4a6_newcolumn || row.projectname || "Untitled Project",
+          name: row.cr4a6_project || row.cr4a6_newcolumn || row.project || "Untitled Project", // Ini Tajuk Projek sebenar
           dept: row.cr4a6_projectname || row.projectowner || "Team", // Ini rupa-rupanya nama kolum untuk Owner!
           status: "Active", 
           currentUpdate: row.cr4a6_latestupdate || row.latestupdate || "Not started", 
