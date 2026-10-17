@@ -1268,16 +1268,36 @@ if ($("float-btn")) {
 if ($("close-chat")) $("close-chat").onclick = closeChat;
 if ($("new-project")) {
   $("new-project").onclick = () => {
+    // 1. Buka popup chat
     openChat();
+
+    // 2. Simulasi taip mesej secara automatik dalam kotak chat Copilot selepas 1 saat
     setTimeout(() => {
-      const iframe = document.querySelector("#popup-chat iframe");
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({
-          type: "webchat/send",
-          text: "I want to register a new project. Please ask me the project details."
-        }, "*");
+      // Cari kotak input teks dalam chat Copilot (biasanya textarea atau input)
+      const chatInput = document.querySelector("#popup-chat iframe")?.contentDocument?.querySelector("textarea") ||
+                        document.querySelector("textarea[data-id='webchat-sendbox-input']") ||
+                        document.querySelector(".webchat__send-box-text-box input") ||
+                        document.querySelector("textarea");
+
+      // Cari butang Hantar (Send)
+      const sendButton = document.querySelector("#popup-chat iframe")?.contentDocument?.querySelector("button[title='Send']") ||
+                         document.querySelector("button[title='Send']") ||
+                         document.querySelector(".webchat__send-button");
+
+      if (chatInput) {
+        // Masukkan teks ke dalam kotak input
+        chatInput.value = "I want to register a new project. Please ask me the project details.";
+        chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+        // Cari dan klik butang send jika ada, atau tekan Enter
+        if (sendButton) {
+          sendButton.click();
+        } else {
+          // Fallback: Tekan kekunci Enter secara automatik
+          chatInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+        }
       }
-    }, 600);
+    }, 1000); // Masa tunggu 1 saat untuk pastikan popup betul-betul terbuka
   };
 }
 
