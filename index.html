@@ -1159,7 +1159,7 @@ async function fetchLiveProjects() {
   dept: row.dept || row.owner || "Team",
   status: row.Status === 307920000 ? "Active" : (row.Status || "Active"),
   currentUpdate: row["Current update"] || "Not started",
-  progress: (row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : 0,
+  progress: (row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : "0%",
   date: row["Target date"] ? row["Target date"].split('T')[0] : "2026"
 };
       });
