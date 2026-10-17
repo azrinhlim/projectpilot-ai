@@ -1105,13 +1105,29 @@ function renderProjects(id,query="") {
 /* 3. FETCH LIVE DATA FUNCTION */
 async function fetchLiveProjects() {
   try {
-    // Paste URL JSONbin kau kat dalam tanda petik di bawah (masukkan BIN_ID kau):
-    const flowUrl = "https://api.jsonbin.io/v3/b/6ad2e36cffd5d16053729af3/latest";
+    // 1. Masukkan Bin ID kau kat sini
+    const binId = "6ad2e36cffd5d16053729af3"; 
+    
+    // 2. Masukkan Master Key (atau Access Key) JSONbin kau kat sini
+    const masterKey = "$2a$10$ClBfH3kYykD/9UV.SauOxem9dy49tFyOmqdRabVM5/ZbvD3CgUq3q"; 
 
-    const response = await fetch(flowUrl);
+    const flowUrl = `https://api.jsonbin.io/v3/b/${binId}/latest`;
+
+    // Kita hantar X-Master-Key supaya JSONbin bagi kebenaran (tak kena 401 lagi!)
+    const response = await fetch(flowUrl, {
+      method: 'GET',
+      headers: {
+        'X-Master-Key': masterKey
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
+    }
+
     const result = await response.json();
     
-    // JSONbin menyimpan data dalam result.record
+    // Data projek tersimpan dalam result.record
     const rawData = result.record || result;
     const items = Array.isArray(rawData) ? rawData : (rawData.value || []);
 
