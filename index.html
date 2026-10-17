@@ -1105,18 +1105,18 @@ function renderProjects(id,query="") {
 /* 3. FETCH LIVE DATA FUNCTION */
 async function fetchLiveProjects() {
   try {
-    const flowUrl = "PASTE_URL_POWER_AUTOMATE_KAU_KAT_SINI";
-    
-    // Elak fetch jika URL belum diganti
-    if (flowUrl.includes("PASTE_URL")) return;
+    // Paste URL JSONbin kau kat dalam tanda petik di bawah (masukkan BIN_ID kau):
+    const flowUrl = "https://api.jsonbin.io/v3/b/6ad2e36cffd5d16053729af3/latest";
 
     const response = await fetch(flowUrl);
-    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-
-    const data = await response.json();
+    const result = await response.json();
     
-    if (data && Array.isArray(data.value) && data.value.length > 0) {
-      projects = data.value.map(row => ({
+    // JSONbin menyimpan data dalam result.record
+    const rawData = result.record || result;
+    const items = Array.isArray(rawData) ? rawData : (rawData.value || []);
+
+    if (items.length > 0) {
+      projects = items.map(row => ({
         name: row.cr4a6_projectname || row.name || "Untitled Project",
         dept: row.cr4a6_department || row.dept || "General",
         status: row.cr4a6_status || "On track",
@@ -1125,16 +1125,18 @@ async function fetchLiveProjects() {
         date: row.cr4a6_targetdate || "2026"
       }));
 
-      // Update stat angka Total Projects
+      // Update nombor "Total projects" kat statistik dashboard secara LIVE!
       const totalStat = document.querySelector('.stat strong');
-      if (totalStat) totalStat.textContent = projects.length;
+      if (totalStat) {
+        totalStat.textContent = projects.length;
+      }
 
-      // Re-render jadual dengan live data
+      // Render semula jadual projek
       renderProjects("dash-projects");
       renderProjects("all-projects");
     }
   } catch (error) {
-    console.warn("Menggunakan data default (Live data fetch error):", error.message);
+    console.warn("Gagal menarik data dari JSONbin:", error);
   }
 }
 
