@@ -1060,44 +1060,54 @@ const embedUrl=
 
 const $=id=>document.getElementById(id);
 
-/* SAMPLE PROJECT DATA */
-const projects=[
-  {name:"Cafe at Main Branch",dept:"Facilities",status:"On track",progress:75,owner:"SH",date:"25 Dec 2026"},
-  {name:"Office Renovation",dept:"Administration",status:"On track",progress:60,owner:"AK",date:"30 Nov 2026"},
-  {name:"Walkie-Talkie Procurement",dept:"Safety",status:"At risk",progress:40,owner:"ZR",date:"15 Dec 2026"},
-  {name:"Document Digitisation",dept:"Operations",status:"Completed",progress:100,owner:"LT",date:"30 Sep 2026"}
-];
+/* WORKING GROUP 10 CONNECTION */
+const envId="37954b56-6662-eab5-8c43-065ce3edaff5";
+const botName="cr4a6_Group10";
 
-function renderProjects(id,query="") {
-  const list=projects.filter(p=>
-    [p.name,p.dept,p.status,p.owner]
-      .join(" ").toLowerCase().includes(query.toLowerCase())
-  );
+const embedUrl=
+  `https://copilotstudio.microsoft.com/environments/${envId}/bots/${botName}/webchat?__profile__=pva`;
 
-  $(id).innerHTML=list.map(p=>{
-    const badge=p.status==="On track"?"track":
-      p.status==="At risk"?"risk":"done";
+const $=id=>document.getElementById(id);
 
-    return `
-      <tr>
-        <td class="project-name">
-          ${p.name}
-          <small>${p.dept}</small>
-        </td>
-        <td><span class="status ${badge}">${p.status}</span></td>
-        <td>
-          <div class="progress">
-            <span style="width:${p.progress}%"></span>
-          </div>
-          <small>${p.progress}%</small>
-        </td>
-        <td>${p.owner}</td>
-        <td>${p.date}</td>
-      </tr>
-    `;
-  }).join("") || '<tr><td colspan="5">No matching projects.</td></tr>';
+/* LIVE DATA VERSE INTEGRATION */
+let projects = [];
+
+async function fetchLiveProjects() {
+  try {
+    // 1. Masukkan URL Power Automate HTTP yang kau copy tadi di sini:
+    const flowUrl = "https://37954b566662eab58c43065ce3edaf.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/27/workflows/8d249f04baf84dc9bb9907b786c07820/triggers/manual/paths/invoke?api-version=1";
+    
+    const response = await fetch(flowUrl);
+    const data = await response.json();
+    
+    // 2. Mapping data dari Dataverse table ke format dashboard
+    projects = data.value.map(row => ({
+      name: row.cr4a6_projectname || row.name || "Untitled Project",
+      dept: row.cr4a6_department || row.dept || "General",
+      status: row.cr4a6_status || "On track",
+      progress: row.cr4a6_progress || 50,
+      owner: row.cr4a6_owner || "Team",
+      date: row.cr4a6_targetdate || "2026"
+    }));
+
+    // 3. Update nombor "Total projects" kat statistik dashboard secara LIVE
+    const totalStat = document.querySelector('.stat strong');
+    if (totalStat) {
+      totalStat.textContent = projects.length;
+    }
+
+    // 4. Render semula table dengan data sebenar
+    renderProjects("dash-projects");
+    renderProjects("all-projects");
+
+  } catch (error) {
+    console.error("Gagal menarik live data dari Dataverse:", error);
+  }
 }
 
+// Panggil fungsi ni semasa halaman dibuka
+fetchLiveProjects();
+  
 renderProjects("dash-projects");
 renderProjects("all-projects");
 
