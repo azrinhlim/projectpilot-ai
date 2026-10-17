@@ -1154,13 +1154,13 @@ async function fetchLiveProjects() {
         }
 
         return {
-          name: row.cr4a6_project || row.cr4a6_newcolumn || row.project || "Untitled Project", // Ini Tajuk Projek sebenar
-          dept: row.cr4a6_projectname || row.projectowner || "Team", // Ini rupa-rupanya nama kolum untuk Owner!
-          status: "Active", 
-          currentUpdate: row.cr4a6_latestupdate || row.latestupdate || "Not started", 
-          progress: (row.cr4a6_progress !== undefined && row.cr4a6_progress !== null) ? Number(row.cr4a6_progress) : 0,
-          date: dateText
-        };
+  name: row.Project || "Untitled Project",
+  dept: row.dept || row.owner || "Team",
+  status: row.Status === 307920000 ? "Active" : (row.Status || "Active"),
+  currentUpdate: row["Current update"] || "Not started",
+  progress: (row.Progress !== undefined && row.Progress !== null) ? `${row.Progress}%` : "0%",
+  date: row["Target date"] ? row["Target date"].split('T')[0] : "2026"
+};
       });
 
       const totalStat = document.querySelector('.stat strong');
