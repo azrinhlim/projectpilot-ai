@@ -60,7 +60,7 @@ button:focus-visible,input:focus-visible {
 .brand {
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:px;
   padding:25px 18px 34px;
   white-space:nowrap;
 }
@@ -126,7 +126,7 @@ button:focus-visible,input:focus-visible {
 }
 .side-footer {
   margin-top:auto;
-  padding:12px;
+  padding:px;
 }
 .side-note {
   background:#f8faff;
@@ -141,7 +141,7 @@ button:focus-visible,input:focus-visible {
   margin-top:5px;
 }
 .collapse-btn {
-  margin-top:12px;
+  margin-top:px;
   width:40px;
   height:40px;
   border:1px solid var(--border);
@@ -151,7 +151,7 @@ button:focus-visible,input:focus-visible {
 }
 .sidebar.collapsed .collapse-btn {
   display:block;
-  margin:12px auto 0;
+  margin:px auto 0;
 }
 
 /* MAIN */
@@ -173,10 +173,10 @@ button:focus-visible,input:focus-visible {
   gap:10px;
   width:320px;
   max-width:100%;
-  padding:12px;
+  padding:px;
   border:1px solid var(--border);
   background:#fafbff;
-  border-radius:12px;
+  border-radius:px;
   color:#8290a8;
 }
 .top-search input {
@@ -184,7 +184,7 @@ button:focus-visible,input:focus-visible {
   background:transparent;
   outline:0;
   width:100%;
-  font-size:12px;
+  font-size:px;
   color:var(--ink);
 }
 .profile {
@@ -206,7 +206,7 @@ button:focus-visible,input:focus-visible {
 }
 .eyebrow {
   color:#7183a1;
-  font-size:12px;
+  font-size:px;
 }
 h1 {
   font:800 clamp(23px,2.5vw,32px) "Plus Jakarta Sans";
@@ -247,7 +247,7 @@ h1 {
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:12px;
+  gap:px;
   margin-bottom:18px;
 }
 h2 {
@@ -301,7 +301,7 @@ h2 {
 }
 .search {
   width:100%;
-  padding:12px 13px;
+  padding:px 13px;
   border:1px solid var(--border);
   background:#fbfcff;
   border-radius:10px;
@@ -316,7 +316,7 @@ table {
 }
 th {
   text-align:left;
-  padding:12px 9px;
+  padding:px 9px;
   font-size:10px;
   color:var(--muted);
 }
@@ -341,7 +341,7 @@ td {
   white-space:nowrap;
 }
 .status.track {background:#e7f9f1;color:#009b75}
-.status.risk {background:#fff1e5;color:#ce8122}
+.status.risk {background:#fff1e5;color:#ce82}
 .status.done {background:#e7f9f1;color:#009b75}
 .progress {
   width:85px;
@@ -363,8 +363,8 @@ td {
 }
 .lower-grid .card {margin:0}
 .donut {
-  width:112px;
-  height:112px;
+  width:1px;
+  height:1px;
   margin:15px auto;
   border-radius:50%;
   background:conic-gradient(
@@ -392,7 +392,7 @@ td {
   line-height:2.1;
 }
 .item {
-  padding:12px 0;
+  padding:px 0;
   border-bottom:1px solid #f0f3f9;
 }
 .item:last-child {border-bottom:0}
@@ -416,7 +416,7 @@ td {
 .insight-heading {
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:px;
   margin-bottom:18px;
 }
 .insight-heading .logo {
@@ -435,18 +435,18 @@ td {
 .insight-intro {
   color:#5d6d87;
   line-height:1.8;
-  font-size:12px;
+  font-size:px;
   margin-bottom:20px;
 }
 .insight-action {
   width:100%;
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:px;
   text-align:left;
   border:1px solid var(--border);
   background:white;
-  border-radius:12px;
+  border-radius:px;
   padding:14px 13px;
   margin-bottom:10px;
   color:#253650;
@@ -478,9 +478,9 @@ td {
 .quick-card p {
   color:#7587a1;
   line-height:1.7;
-  font-size:12px;
+  font-size:px;
 }
-.quick-card .primary {width:100%;margin-top:12px}
+.quick-card .primary {width:100%;margin-top:px}
 
 /* FULL AI WORKSPACE */
 .assistant-workspace {
@@ -490,7 +490,7 @@ td {
 .assistant-header {
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:px;
   padding:18px 20px;
   border-bottom:1px solid var(--border);
 }
@@ -1055,8 +1055,11 @@ td {
 const envId="37954b56-6662-eab5-8c43-065ce3edaff5";
 const botName="cr4a6_Group10";
 
-const embedUrl=
-  `https://copilotstudio.microsoft.com/environments/${envId}/bots/${botName}/webchat?__profile__=pva`;
+// URL asal
+const baseEmbedUrl = `https://copilotstudio.microsoft.com/environments/${envId}/bots/${botName}/webchat?__profile__=pva`;
+
+// URL dengan mesej automatik khas untuk butang New Project
+const embedUrlWithPrompt = baseEmbedUrl + "&text=" + encodeURIComponent("I want to register a new project.");
 
 const $=id=>document.getElementById(id);
 
@@ -1237,16 +1240,25 @@ if ($("sidebar-toggle")) {
 }
 
 /* CHAT INTEGRATION */
-function loadChat(id) {
+function loadChat(id, customUrl = embedUrl) {
   const container = $(id);
-  if (!container || container.querySelector("iframe")) return;
+  if (!container) return;
+  
+  // Kosongkan dulu kalau ada iframe lama
+  container.innerHTML = "";
 
   const iframe = document.createElement("iframe");
-  iframe.src = embedUrl;
+  iframe.src = customUrl; 
   iframe.title = "Group 10 Copilot Studio";
   iframe.setAttribute("allow", "clipboard-write");
 
   container.appendChild(iframe);
+}
+
+function openChatWithPrompt() {
+  if ($("popup")) $("popup").classList.add("open");
+  if ($("float-btn")) $("float-btn").textContent = "✕";
+  loadChat("popup-chat", embedUrlWithPrompt); // Guna URL yang ada mesej automatik!
 }
 
 function openChat() {
@@ -1266,38 +1278,26 @@ if ($("float-btn")) {
 }
 
 if ($("close-chat")) $("close-chat").onclick = closeChat;
+
 if ($("new-project")) {
   $("new-project").onclick = () => {
-    // 1. Buka popup chat
-    openChat();
+    // 1. Bina pautan URL chat yang terus membawa mesej arahan pendaftaran projek
+    const promptUrl = embedUrl + "&text=" + encodeURIComponent("I want to register a new project. Please ask me the project details.");
+    
+    // 2. Buka tetingkap popup chat
+    if ($("popup")) $("popup").classList.add("open");
+    if ($("float-btn")) $("float-btn").textContent = "✕";
 
-    // 2. Simulasi taip mesej secara automatik dalam kotak chat Copilot selepas 4 saat
-    setTimeout(() => {
-      // Cari kotak input teks dalam chat Copilot (biasanya textarea atau input)
-      const chatInput = document.querySelector("#popup-chat iframe")?.contentDocument?.querySelector("textarea") ||
-                        document.querySelector("textarea[data-id='webchat-sendbox-input']") ||
-                        document.querySelector(".webchat__send-box-text-box input") ||
-                        document.querySelector("textarea");
-
-      // Cari butang Hantar (Send)
-      const sendButton = document.querySelector("#popup-chat iframe")?.contentDocument?.querySelector("button[title='Send']") ||
-                         document.querySelector("button[title='Send']") ||
-                         document.querySelector(".webchat__send-button");
-
-      if (chatInput) {
-        // Masukkan teks ke dalam kotak input
-        chatInput.value = "I want to register a new project.";
-        chatInput.dispatchEvent(new Event('input', { bubbles: true }));
-
-        // Cari dan klik butang send jika ada, atau tekan Enter
-        if (sendButton) {
-          sendButton.click();
-        } else {
-          // Fallback: Tekan kekunci Enter secara automatik
-          chatInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-        }
-      }
-    }, 4000); // Masa tunggu 1 saat untuk pastikan popup betul-betul terbuka
+    // 3. Masukkan iframe chat dengan pautan URL automatik tersebut
+    const container = $("popup-chat");
+    if (container) {
+      container.innerHTML = ""; 
+      const iframe = document.createElement("iframe");
+      iframe.src = promptUrl;
+      iframe.title = "Group 10 Copilot Studio";
+      iframe.setAttribute("allow", "clipboard-write");
+      container.appendChild(iframe);
+    }
   };
 }
 
