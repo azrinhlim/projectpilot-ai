@@ -1060,19 +1060,61 @@ const embedUrl=
 
 const $=id=>document.getElementById(id);
 
-/* LIVE DATA VERSE INTEGRATION */
-let projects = [];
+/* 1. INITIAL DUMMY / FALLBACK DATA */
+let projects = [
+  {name:"Cafe at Main Branch",dept:"Facilities",status:"On track",progress:75,owner:"SH",date:"25 Dec 2026"},
+  {name:"Office Renovation",dept:"Administration",status:"On track",progress:60,owner:"AK",date:"30 Nov 2026"},
+  {name:"Walkie-Talkie Procurement",dept:"Safety",status:"At risk",progress:40,owner:"ZR",date:"15 Dec 2026"},
+  {name:"Document Digitisation",dept:"Operations",status:"Completed",progress:100,owner:"LT",date:"30 Sep 2026"}
+];
 
+/* 2. RENDER FUNCTION (MUST BE DEFINED FIRST) */
+function renderProjects(id,query="") {
+  const targetEl = $(id);
+  if (!targetEl) return;
+
+  const list = projects.filter(p=>
+    [p.name, p.dept, p.status, p.owner]
+      .join(" ").toLowerCase().includes(query.toLowerCase())
+  );
+
+  targetEl.innerHTML = list.map(p => {
+    const badge = p.status === "On track" ? "track" :
+                  p.status === "At risk" ? "risk" : "done";
+
+    return `
+      <tr>
+        <td class="project-name">
+          ${p.name}
+          <small>${p.dept}</small>
+        </td>
+        <td><span class="status ${badge}">${p.status}</span></td>
+        <td>
+          <div class="progress">
+            <span style="width:${p.progress}%"></span>
+          </div>
+          <small>${p.progress}%</small>
+        </td>
+        <td>${p.owner}</td>
+        <td>${p.date}</td>
+      </tr>
+    `;
+  }).join("") || '<tr><td colspan="5">No matching projects.</td></tr>';
+}
+
+/* 3. FETCH LIVE DATA FUNCTION */
 async function fetchLiveProjects() {
   try {
-    const flowUrl = "https://37954b566662eab58c43065ce3edaf.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/27/workflows/8d249f04baf84dc9bb9907b786c07820/triggers/manual/paths/invoke?api-version=1";
+    const flowUrl = "PASTE_URL_POWER_AUTOMATE_KAU_KAT_SINI";
     
+    // Elak fetch jika URL belum diganti
+    if (flowUrl.includes("PASTE_URL")) return;
+
     const response = await fetch(flowUrl);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
 
     const data = await response.json();
     
-    // Pastikan data.value wujud dan berbentuk array
     if (data && Array.isArray(data.value) && data.value.length > 0) {
       projects = data.value.map(row => ({
         name: row.cr4a6_projectname || row.name || "Untitled Project",
@@ -1082,170 +1124,156 @@ async function fetchLiveProjects() {
         owner: row.cr4a6_owner || "Team",
         date: row.cr4a6_targetdate || "2026"
       }));
-    } else {
-      throw new Error("Data kosong atau format tidak sepadan");
+
+      // Update stat angka Total Projects
+      const totalStat = document.querySelector('.stat strong');
+      if (totalStat) totalStat.textContent = projects.length;
+
+      // Re-render jadual dengan live data
+      renderProjects("dash-projects");
+      renderProjects("all-projects");
     }
-
   } catch (error) {
-    console.warn("Gagal tarik live data (Gunakan data sampel sementara):", error.message);
-    // Data fallback supaya dashboard kekal hidup dan cantik dipandang
-    projects = [
-      {name:"Cafe at Main Branch",dept:"Facilities",status:"On track",progress:75,owner:"SH",date:"25 Dec 2026"},
-      {name:"Office Renovation",dept:"Administration",status:"On track",progress:60,owner:"AK",date:"30 Nov 2026"},
-      {name:"Walkie-Talkie Procurement",dept:"Safety",status:"At risk",progress:40,owner:"ZR",date:"15 Dec 2026"},
-      {name:"Document Digitisation",dept:"Operations",status:"Completed",progress:100,owner:"LT",date:"30 Sep 2026"}
-    ];
+    console.warn("Menggunakan data default (Live data fetch error):", error.message);
   }
-
-  // Update statistik & render jadual
-  const totalStat = document.querySelector('.stat strong');
-  if (totalStat) totalStat.textContent = projects.length;
-
-  renderProjects("dash-projects");
-  renderProjects("all-projects");
 }
 
-// Panggil fungsi ni semasa halaman dibuka
-fetchLiveProjects();
-  
+/* INITIALISE UI IMMEDIATELY */
 renderProjects("dash-projects");
 renderProjects("all-projects");
 
-$("dash-search").oninput=e=>
-  renderProjects("dash-projects",e.target.value);
+// Jalankan fetch secara asenkronus selepas UI dah sedia
+fetchLiveProjects();
 
-$("all-search").oninput=e=>
-  renderProjects("all-projects",e.target.value);
+/* SEARCH INPUTS */
+if ($("dash-search")) {
+  $("dash-search").oninput = e => renderProjects("dash-projects", e.target.value);
+}
+if ($("all-search")) {
+  $("all-search").oninput = e => renderProjects("all-projects", e.target.value);
+}
 
 /* PAGE NAVIGATION */
-const pageTitles={
-  overview:[
+const pageTitles = {
+  overview: [
     "Your project portfolio at a glance",
     "Track progress, identify risks and take action with your AI assistant."
   ],
-  projects:[
+  projects: [
     "Project portfolio",
     "Track projects and delivery progress."
   ],
-  risks:[
+  risks: [
     "Risks & issues",
     "Monitor project risks and issues."
   ],
-  reports:[
+  reports: [
     "Reports & insights",
     "Turn project information into actionable insights."
   ],
-  documents:[
+  documents: [
     "Document workspace",
     "Manage project documents and approvals."
   ],
-  assistant:[
+  assistant: [
     "AI Assistant",
     "Work directly with Group 10."
   ]
 };
 
 function setPage(name) {
-  document.querySelectorAll(".page").forEach(p=>
-    p.classList.toggle("active",p.id==="page-"+name)
+  document.querySelectorAll(".page").forEach(p =>
+    p.classList.toggle("active", p.id === "page-" + name)
   );
 
-  document.querySelectorAll(".nav-btn").forEach(b=>
-    b.classList.toggle("active",b.dataset.page===name)
+  document.querySelectorAll(".nav-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.page === name)
   );
 
-  $("page-heading").textContent=pageTitles[name][0];
-  $("page-subtitle").textContent=pageTitles[name][1];
+  if ($("page-heading")) $("page-heading").textContent = pageTitles[name][0];
+  if ($("page-subtitle")) $("page-subtitle").textContent = pageTitles[name][1];
 
-  if(name==="assistant") loadChat("full-chat");
+  if (name === "assistant") loadChat("full-chat");
 
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
-document.querySelectorAll("[data-page]").forEach(b=>
-  b.onclick=()=>setPage(b.dataset.page)
+document.querySelectorAll("[data-page]").forEach(b =>
+  b.onclick = () => setPage(b.dataset.page)
 );
 
-document.querySelectorAll("[data-goto]").forEach(b=>
-  b.onclick=()=>setPage(b.dataset.goto)
+document.querySelectorAll("[data-goto]").forEach(b =>
+  b.onclick = () => setPage(b.dataset.goto)
 );
 
-$("open-workspace").onclick=()=>setPage("assistant");
+if ($("open-workspace")) $("open-workspace").onclick = () => setPage("assistant");
 
 /* AI INSIGHT QUICK ACTIONS */
-const insightPrompts={
-  summary:"Summarize the current status of all active projects.",
-  risks:"Identify current project risks, issues and delays.",
-  actions:"Recommend the next priority actions for active projects."
-};
-
-document.querySelectorAll("[data-insight]").forEach(b=>{
-  b.onclick=()=>{
-    setPage("assistant");
-    /* The Microsoft iframe is cross-origin.
-       We cannot insert the prompt automatically.
-       User enters the request in Group 10. */
-  };
+document.querySelectorAll("[data-insight]").forEach(b => {
+  b.onclick = () => setPage("assistant");
 });
 
-/* SIDEBAR */
-$("sidebar-toggle").onclick=()=>
-  $("sidebar").classList.toggle("collapsed");
+/* SIDEBAR TOGGLE */
+if ($("sidebar-toggle")) {
+  $("sidebar-toggle").onclick = () => $("sidebar").classList.toggle("collapsed");
+}
 
-/* LOAD REAL GROUP 10 CHAT */
+/* CHAT INTEGRATION */
 function loadChat(id) {
-  const container=$(id);
+  const container = $(id);
+  if (!container || container.querySelector("iframe")) return;
 
-  if(container.querySelector("iframe")) return;
-
-  const iframe=document.createElement("iframe");
-  iframe.src=embedUrl;
-  iframe.title="Group 10 Copilot Studio";
-  iframe.setAttribute("allow","clipboard-write");
+  const iframe = document.createElement("iframe");
+  iframe.src = embedUrl;
+  iframe.title = "Group 10 Copilot Studio";
+  iframe.setAttribute("allow", "clipboard-write");
 
   container.appendChild(iframe);
 }
 
-/* FLOATING CHAT */
 function openChat() {
-  $("popup").classList.add("open");
-  $("float-btn").textContent="✕";
+  if ($("popup")) $("popup").classList.add("open");
+  if ($("float-btn")) $("float-btn").textContent = "✕";
   loadChat("popup-chat");
 }
 
 function closeChat() {
-  $("popup").classList.remove("open");
-  $("float-btn").textContent="✦";
+  if ($("popup")) $("popup").classList.remove("open");
+  if ($("float-btn")) $("float-btn").textContent = "✦";
 }
 
-$("float-btn").onclick=()=>
-  $("popup").classList.contains("open")?closeChat():openChat();
+if ($("float-btn")) {
+  $("float-btn").onclick = () =>
+    $("popup").classList.contains("open") ? closeChat() : openChat();
+}
 
-$("close-chat").onclick=closeChat;
-$("new-project").onclick=openChat;
+if ($("close-chat")) $("close-chat").onclick = closeChat;
+if ($("new-project")) $("new-project").onclick = openChat;
 
-document.querySelectorAll("[data-chat]").forEach(b=>
-  b.onclick=openChat
-);
+document.querySelectorAll("[data-chat]").forEach(b => b.onclick = openChat);
 
-$("expand-chat").onclick=()=>{
-  $("popup").classList.toggle("expanded");
-  $("expand-chat").textContent=
-    $("popup").classList.contains("expanded")?"❐":"⛶";
-};
+if ($("expand-chat")) {
+  $("expand-chat").onclick = () => {
+    $("popup").classList.toggle("expanded");
+    $("expand-chat").textContent =
+      $("popup").classList.contains("expanded") ? "❐" : "⛶";
+  };
+}
 
 /* GLOBAL SEARCH */
-$("global-search").onkeydown=e=>{
-  if(e.key==="Enter") {
-    setPage("projects");
-    $("all-search").value=e.target.value;
-    renderProjects("all-projects",e.target.value);
-  }
-};
+if ($("global-search")) {
+  $("global-search").onkeydown = e => {
+    if (e.key === "Enter") {
+      setPage("projects");
+      if ($("all-search")) $("all-search").value = e.target.value;
+      renderProjects("all-projects", e.target.value);
+    }
+  };
+}
 
-/* ESCAPE */
-document.addEventListener("keydown",e=>{
-  if(e.key==="Escape") closeChat();
+/* ESCAPE KEY */
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeChat();
 });
 </script>
 
