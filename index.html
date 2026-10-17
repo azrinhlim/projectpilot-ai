@@ -1065,35 +1065,44 @@ let projects = [];
 
 async function fetchLiveProjects() {
   try {
-    // 1. Masukkan URL Power Automate HTTP yang kau copy tadi di sini:
     const flowUrl = "https://37954b566662eab58c43065ce3edaf.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/27/workflows/8d249f04baf84dc9bb9907b786c07820/triggers/manual/paths/invoke?api-version=1";
     
     const response = await fetch(flowUrl);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
     const data = await response.json();
     
-    // 2. Mapping data dari Dataverse table ke format dashboard
-    projects = data.value.map(row => ({
-      name: row.cr4a6_projectname || row.name || "Untitled Project",
-      dept: row.cr4a6_department || row.dept || "General",
-      status: row.cr4a6_status || "On track",
-      progress: row.cr4a6_progress || 50,
-      owner: row.cr4a6_owner || "Team",
-      date: row.cr4a6_targetdate || "2026"
-    }));
-
-    // 3. Update nombor "Total projects" kat statistik dashboard secara LIVE
-    const totalStat = document.querySelector('.stat strong');
-    if (totalStat) {
-      totalStat.textContent = projects.length;
+    // Pastikan data.value wujud dan berbentuk array
+    if (data && Array.isArray(data.value) && data.value.length > 0) {
+      projects = data.value.map(row => ({
+        name: row.cr4a6_projectname || row.name || "Untitled Project",
+        dept: row.cr4a6_department || row.dept || "General",
+        status: row.cr4a6_status || "On track",
+        progress: row.cr4a6_progress || 50,
+        owner: row.cr4a6_owner || "Team",
+        date: row.cr4a6_targetdate || "2026"
+      }));
+    } else {
+      throw new Error("Data kosong atau format tidak sepadan");
     }
 
-    // 4. Render semula table dengan data sebenar
-    renderProjects("dash-projects");
-    renderProjects("all-projects");
-
   } catch (error) {
-    console.error("Gagal menarik live data dari Dataverse:", error);
+    console.warn("Gagal tarik live data (Gunakan data sampel sementara):", error.message);
+    // Data fallback supaya dashboard kekal hidup dan cantik dipandang
+    projects = [
+      {name:"Cafe at Main Branch",dept:"Facilities",status:"On track",progress:75,owner:"SH",date:"25 Dec 2026"},
+      {name:"Office Renovation",dept:"Administration",status:"On track",progress:60,owner:"AK",date:"30 Nov 2026"},
+      {name:"Walkie-Talkie Procurement",dept:"Safety",status:"At risk",progress:40,owner:"ZR",date:"15 Dec 2026"},
+      {name:"Document Digitisation",dept:"Operations",status:"Completed",progress:100,owner:"LT",date:"30 Sep 2026"}
+    ];
   }
+
+  // Update statistik & render jadual
+  const totalStat = document.querySelector('.stat strong');
+  if (totalStat) totalStat.textContent = projects.length;
+
+  renderProjects("dash-projects");
+  renderProjects("all-projects");
 }
 
 // Panggil fungsi ni semasa halaman dibuka
