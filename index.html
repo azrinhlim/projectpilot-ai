@@ -1154,8 +1154,8 @@ async function fetchLiveProjects() {
         }
 
         return {
-          name: row.cr4a6_newcolumn || row.cr4a6_projectname || row.projectname || "Untitled Project", // Mengambil Nama Projek (New column)
-          dept: row.cr4a6_projectowner || row.projectowner || row.owner || "Team", // Mengambil Nama Owner di bawah
+          name: row.cr4a6_projectname || row.cr4a6_newcolumn || row.projectname || "Untitled Project",
+          dept: row.cr4a6_projectowner || row.projectowner || row.owner || "Team",
           status: "Active", 
           currentUpdate: row.cr4a6_latestupdate || row.latestupdate || "Not started", 
           progress: row.cr4a6_progress !== undefined ? row.cr4a6_progress : 50,
