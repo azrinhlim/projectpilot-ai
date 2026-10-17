@@ -1066,17 +1066,25 @@ let projects = [
   {name:"Document Digitisation",dept:"Operations",status:"Completed",progress:100,owner:"LT",date:"30 Sep 2026"}
 ];
 
-/* 2. RENDER FUNCTION (Jadual tanpa lajur Owner) */
+/* 2. RENDER FUNCTION DENGAN LIMIT & VIEW ALL */
+let isExpanded = false; // Status untuk kawal kembang/ciut jadual
+
 function renderProjects(id, query = "") {
   const targetEl = $(id);
   if (!targetEl) return;
 
-  const list = projects.filter(p =>
+  const filteredList = projects.filter(p =>
     [p.name, p.dept, p.status]
       .join(" ").toLowerCase().includes(query.toLowerCase())
   );
 
-  targetEl.innerHTML = list.map(p => {
+  // Jika di dashboard ('dash-projects') dan belum kembang, hadkan 6 je
+  const isDashboard = (id === "dash-projects");
+  const displayList = (isDashboard && !isExpanded && !query) 
+    ? filteredList.slice(0, 6) 
+    : filteredList;
+
+  targetEl.innerHTML = displayList.map(p => {
     return `
       <tr>
         <td class="project-name">
@@ -1094,6 +1102,22 @@ function renderProjects(id, query = "") {
       </tr>
     `;
   }).join("") || '<tr><td colspan="4">No matching projects.</td></tr>';
+
+  // Update teks butang "View all" di dashboard jika ada
+  if (isDashboard && !query) {
+    const viewAllBtn = document.querySelector('[data-goto="projects"]');
+    // Cari butang View all dalam kad head dashboard
+    const cardHeadBtn = document.querySelector('.card-head .link-btn');
+    if (cardHeadBtn && cardHeadBtn.dataset.goto === "projects") {
+      // Kita tukar jadi butang toggle kembang/ciut khusus untuk dashboard
+      cardHeadBtn.textContent = isExpanded ? "View less ↑" : "View all →";
+      cardHeadBtn.onclick = (e) => {
+        e.preventDefault();
+        isExpanded = !isExpanded;
+        renderProjects("dash-projects");
+      };
+    }
+  }
 }
 
 /* 3. FETCH LIVE DATA FUNCTION */
