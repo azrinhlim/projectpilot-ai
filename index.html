@@ -1271,7 +1271,7 @@ if ($("new-project")) {
     // 1. Buka popup chat
     openChat();
 
-    // 2. Simulasi taip mesej secara automatik dalam kotak chat Copilot selepas 1 saat
+    // 2. Simulasi taip mesej secara automatik dalam kotak chat Copilot selepas 4 saat
     setTimeout(() => {
       // Cari kotak input teks dalam chat Copilot (biasanya textarea atau input)
       const chatInput = document.querySelector("#popup-chat iframe")?.contentDocument?.querySelector("textarea") ||
@@ -1286,7 +1286,7 @@ if ($("new-project")) {
 
       if (chatInput) {
         // Masukkan teks ke dalam kotak input
-        chatInput.value = "I want to register a new project. Please ask me the project details.";
+        chatInput.value = "I want to register a new project.";
         chatInput.dispatchEvent(new Event('input', { bubbles: true }));
 
         // Cari dan klik butang send jika ada, atau tekan Enter
@@ -1297,7 +1297,7 @@ if ($("new-project")) {
           chatInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
         }
       }
-    }, 1000); // Masa tunggu 1 saat untuk pastikan popup betul-betul terbuka
+    }, 4000); // Masa tunggu 1 saat untuk pastikan popup betul-betul terbuka
   };
 }
 
