@@ -1240,31 +1240,24 @@ if ($("sidebar-toggle")) {
 }
 
 /* CHAT INTEGRATION */
-function loadChat(id, customUrl = embedUrl) {
-  const container = $(id);
-  if (!container) return;
-  
-  // Kosongkan dulu kalau ada iframe lama
-  container.innerHTML = "";
+const envId = "37954b56-6662-eab5-8c43-065ce3edaff5";
+const botName = "cr4a6_Group10";
 
-  const iframe = document.createElement("iframe");
-  iframe.src = customUrl; 
-  iframe.title = "Group 10 Copilot Studio";
-  iframe.setAttribute("allow", "clipboard-write");
-
-  container.appendChild(iframe);
-}
-
-function openChatWithPrompt() {
-  if ($("popup")) $("popup").classList.add("open");
-  if ($("float-btn")) $("float-btn").textContent = "✕";
-  loadChat("popup-chat", embedUrlWithPrompt); // Guna URL yang ada mesej automatik!
-}
+const embedUrl = `https://copilotstudio.microsoft.com/environments/${envId}/bots/${botName}/webchat?__profile__=pva`;
 
 function openChat() {
   if ($("popup")) $("popup").classList.add("open");
   if ($("float-btn")) $("float-btn").textContent = "✕";
-  loadChat("popup-chat");
+  
+  const container = $("popup-chat");
+  if (container && !container.querySelector("iframe")) {
+    container.innerHTML = "";
+    const iframe = document.createElement("iframe");
+    iframe.src = embedUrl;
+    iframe.title = "Group 10 Copilot Studio";
+    iframe.setAttribute("allow", "clipboard-write");
+    container.appendChild(iframe);
+  }
 }
 
 function closeChat() {
@@ -1279,16 +1272,14 @@ if ($("float-btn")) {
 
 if ($("close-chat")) $("close-chat").onclick = closeChat;
 
+// BUTANG NEW PROJECT (Guna cara URL parameter paling selamat)
 if ($("new-project")) {
   $("new-project").onclick = () => {
-    // 1. Bina pautan URL chat yang terus membawa mesej arahan pendaftaran projek
     const promptUrl = embedUrl + "&text=" + encodeURIComponent("I want to register a new project. Please ask me the project details.");
     
-    // 2. Buka tetingkap popup chat
     if ($("popup")) $("popup").classList.add("open");
     if ($("float-btn")) $("float-btn").textContent = "✕";
 
-    // 3. Masukkan iframe chat dengan pautan URL automatik tersebut
     const container = $("popup-chat");
     if (container) {
       container.innerHTML = ""; 
@@ -1327,10 +1318,10 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeChat();
 });
 
-// ===== LETAK KOD AUTO-REFRESH 3 SAAT KAT SINI =====
-   setInterval(() => {
-     fetchLiveProjects();
-   }, 3000);
+// Auto-refresh live data setiap 3 saat
+setInterval(() => {
+  fetchLiveProjects();
+}, 3000);
   
 </script>
 
