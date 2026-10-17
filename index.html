@@ -1258,7 +1258,7 @@ if ($("close-chat")) $("close-chat").onclick = closeChat;
 // BUTANG NEW PROJECT (URL Parameter)
 if ($("new-project")) {
   $("new-project").onclick = () => {
-    const promptUrl = baseEmbedUrl + "&text=" + encodeURIComponent("I want to register a new project. Please ask me the project details.");
+    const promptUrl = baseEmbedUrl + "&pva_text=" + encodeURIComponent("I want to register a new project. Please ask me the project details.");
     
     if ($("popup")) $("popup").classList.add("open");
     if ($("float-btn")) $("float-btn").textContent = "✕";
