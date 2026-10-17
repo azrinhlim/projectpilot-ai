@@ -1266,7 +1266,20 @@ if ($("float-btn")) {
 }
 
 if ($("close-chat")) $("close-chat").onclick = closeChat;
-if ($("new-project")) $("new-project").onclick = openChat;
+if ($("new-project")) {
+  $("new-project").onclick = () => {
+    openChat();
+    setTimeout(() => {
+      const iframe = document.querySelector("#popup-chat iframe");
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: "webchat/send",
+          text: "I want to register a new project. Please ask me the project details."
+        }, "*");
+      }
+    }, 600);
+  };
+}
 
 document.querySelectorAll("[data-chat]").forEach(b => b.onclick = openChat);
 
