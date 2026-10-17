@@ -1088,19 +1088,20 @@ function renderProjects(id, query = "") {
     return `
       <tr>
         <td class="project-name">
-          ${p.name}
-          <small>${p.dept}</small>
-        </td>
-        <td><span class="status track">${p.status}</span></td>
-        <td><span style="color:#55657e; font-weight:500;">${p.currentUpdate}</span></td>
-        <td>
-          <div class="progress">
-            <span style="width:${p.progress}%"></span>
-          </div>
-          <small>${p.progress}%</small>
-        </td>
-        <td>${p.date}</td>
-      </tr>
+  ${p.name}
+  <small>${p.dept}</small>
+</td>
+<td><span class="status track">${p.status}</span></td>
+<td><span style="color:#55657e; font-weight:500;">${p.currentUpdate}</span></td>
+<td>
+  <div class="progress">
+    <!-- Buang tanda % di sini sebab nilai progress dah ada % / atau biarkan bergantung pada nombor -->
+    <span style="width:${p.progress}"></span>
+  </div>
+  <small>${p.progress}</small>
+</td>
+<td>${p.date}</td>
+</tr>
     `;
   }).join("") || '<tr><td colspan="5">No matching projects.</td></tr>';
 
@@ -1158,7 +1159,7 @@ async function fetchLiveProjects() {
   dept: row.dept || row.owner || "Team",
   status: row.Status === 307920000 ? "Active" : (row.Status || "Active"),
   currentUpdate: row["Current update"] || "Not started",
-  progress: (row.Progress !== undefined && row.Progress !== null) ? `${row.Progress}%` : "0%",
+  progress: (row.Progress !== undefined && row.Progress !== null) ? `${Number(row.Progress)}%` : "0%"
   date: row["Target date"] ? row["Target date"].split('T')[0] : "2026"
 };
       });
