@@ -1067,7 +1067,7 @@ let projects = [
   {name:"Document Digitisation",dept:"Operations",status:"Completed",progress:100,owner:"LT",date:"30 Sep 2026"}
 ];
 
-/* 2. RENDER FUNCTION DENGAN CURRENT UPDATE */
+/* 2. RENDER FUNCTION DENGAN CURRENT UPDATE & SYMBOL % */
 let isExpanded = false; 
 
 function renderProjects(id, query = "") {
@@ -1088,19 +1088,19 @@ function renderProjects(id, query = "") {
     return `
       <tr>
         <td class="project-name">
-  ${p.name}
-  <small>${p.dept}</small>
-</td>
-<td><span class="status track">${p.status}</span></td>
-<td><span style="color:#55657e; font-weight:500;">${p.currentUpdate}</span></td>
-<td>
-  <div class="progress">
-    <span style="width:${p.progress}%"></span>
-  </div>
-  <small>${p.progress}</small>
-</td>
-<td>${p.date}</td>
-</tr>
+          ${p.name}
+          <small>${p.dept}</small>
+        </td>
+        <td><span class="status track">${p.status}</span></td>
+        <td><span style="color:#55657e; font-weight:500;">${p.currentUpdate}</span></td>
+        <td>
+          <div class="progress">
+            <span style="width:${p.progress}%"></span>
+          </div>
+          <small>${p.progress}%</small>
+        </td>
+        <td>${p.date}</td>
+      </tr>
     `;
   }).join("") || '<tr><td colspan="5">No matching projects.</td></tr>';
 
@@ -1141,7 +1141,6 @@ async function fetchLiveProjects() {
 
     if (items.length > 0) {
       projects = items.map(row => {
-        // Format tarikh siap
         let dateText = "2026";
         const rawDate = row.cr4a6_targetcompletiondate || row.targetcompletiondate || row.cr4a6_targetdate || row.date;
         if (rawDate) {
@@ -1154,13 +1153,14 @@ async function fetchLiveProjects() {
         }
 
         return {
-  name: row.Project || "Untitled Project",
-  dept: row.dept || row.ProjectOwner || row.projectowner || row.cr4a6_projectowner || row.cr4a6_projectname || row.owner || "Team",
-  status: row.Status === 307920000 ? "Active" : (row.Status || "Active"),
-  currentUpdate: row["Current update"] || "Not started",
-  progress: (row.progress !== undefined && row.progress !== null) ? Number(row.progress) : ((row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : 0),
-  date: row["Target date"] ? row["Target date"].split('T')[0] : "2026"
-};
+          name: row.Project || row.name || "Untitled Project",
+          // Menyemak pelbagai kemungkinan nama key untuk owner dari Power Automate / JSONBin
+          dept: row.dept || row.ProjectOwner || row.projectowner || row.cr4a6_projectowner || row.cr4a6_projectname || row.owner || "Azrin",
+          status: row.Status === 307920000 || row.status === 307920000 ? "Active" : (row.Status || row.status || "Active"),
+          currentUpdate: row["Current update"] || row.currentUpdate || "Not started",
+          progress: (row.progress !== undefined && row.progress !== null) ? Number(row.progress) : ((row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : 0),
+          date: row["Target date"] || row.date ? (row["Target date"] || row.date).split('T')[0] : "2026"
+        };
       });
 
       const totalStat = document.querySelector('.stat strong');
