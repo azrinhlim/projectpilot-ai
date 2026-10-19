@@ -1155,10 +1155,10 @@ async function fetchLiveProjects() {
 
         return {
   name: row.Project || "Untitled Project",
-  dept: row.ProjectOwner || row.projectowner || row.cr4a6_projectowner || row.cr4a6_projectname || row.dept || row.owner || "Team",
+  dept: row.dept || row.ProjectOwner || row.projectowner || row.cr4a6_projectowner || row.cr4a6_projectname || row.owner || "Team",
   status: row.Status === 307920000 ? "Active" : (row.Status || "Active"),
   currentUpdate: row["Current update"] || "Not started",
-  progress: (row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : 0,
+  progress: (row.progress !== undefined && row.progress !== null) ? Number(row.progress) : ((row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : 0),
   date: row["Target date"] ? row["Target date"].split('T')[0] : "2026"
 };
       });
