@@ -1225,24 +1225,54 @@ function renderUpcomingMilestones(projectsData) {
   }).join('');
 }
 
-/* FUNGSI PAPARAN DINAMIK RECENT ACTIVITY */
+/* FUNGSI FORMAT MASA RELATIF (Contoh: 5m ago, 2h ago, Yesterday) */
+function formatTimeAgo(dateString) {
+  if (!dateString) return "Recently";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "Recently";
+
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+
+  if (seconds < 60) return "Just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days}d ago`;
+  
+  return date.toLocaleDateString("en-GB", { day: 'numeric', month: 'short' });
+}
+
+/* FUNGSI PAPARAN RECENT ACTIVITY SUSUNAN MODIFIEDON */
 function renderRecentActivity(projectsData) {
   const container = $("recent-activity-container");
   if (!container) return;
 
-  const displayActivities = projectsData.slice(0, 3);
+  // Salin senarai projek & susun mengikut modifiedOn yang paling terbaharu (Descending)
+  const sortedProjects = [...projectsData].sort((a, b) => {
+    const timeA = a.modifiedOn ? new Date(a.modifiedOn).getTime() : 0;
+    const timeB = b.modifiedOn ? new Date(b.modifiedOn).getTime() : 0;
+    return timeB - timeA; // Paling baharu di atas
+  });
+
+  const displayActivities = sortedProjects.slice(0, 3);
 
   if (displayActivities.length === 0) {
-    container.innerHTML = '<div class="item"><small style="color:#8492a9;">No recent activity.</small></div>';
+    container.innerHTML = '<div class="item"><small style="color:#8492a9;">Tiada aktiviti terkini.</small></div>';
     return;
   }
 
   container.innerHTML = displayActivities.map(p => {
     const updateText = p.currentUpdate || "Progress update recorded";
+    const timeLabel = formatTimeAgo(p.modifiedOn);
+
     return `
       <div class="item" onclick="showProjectDetails('${encodeURIComponent(p.name)}')" style="cursor:pointer;">
         <strong>${updateText}</strong>
-        <small>${p.name}</small>
+        <small>${p.name} · <span style="color:#3d78f6; font-weight:600;">${timeLabel}</span></small>
       </div>
     `;
   }).join('');
@@ -1378,7 +1408,8 @@ async function fetchLiveProjects() {
           currentStep: row.currentStep || row.CurrentStep || row.cr4a6_currentstep || "Project setup",
           nextTargetDate: nextTargetDateText,
           progress: (row.progress !== undefined && row.progress !== null) ? Number(row.progress) : ((row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : (Number(row.cr4a6_progress) || 0)),
-          date: dateText
+          date: dateText,
+          modifiedOn: row.modifiedon || row.modifiedOn || row.ModifiedOn || row.cr4a6_modifiedon || null
         };
       });
 
