@@ -1181,7 +1181,9 @@ async function fetchLiveProjects() {
 
           progress: (row.progress !== undefined && row.progress !== null) ? Number(row.progress) : ((row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : 0),
 
-          date: row["Target date"] || row.date ? (row["Target date"] || row.date).split('T')[0] : "2026"
+          date: (row["Target Completion Date"] || row["Target date"] || row.TargetCompletionDate || row.cr4a6_targetcompletiondate || row.date) 
+      ? String(row["Target Completion Date"] || row["Target date"] || row.TargetCompletionDate || row.cr4a6_targetcompletiondate || row.date).split('T')[0] 
+      : "-"
 
         };
       });
