@@ -761,18 +761,24 @@ td {
         <div class="lower-grid">
 
           <div class="card">
-  <div class="card-head"><h2>Risk & issue overview</h2></div>
-  <div class="donut">
-    <div class="donut-inner">
-      <div><strong id="risk-total">5</strong><br><small>Total</small></div>
-    </div>
-  </div>
-  <div class="legend">
-    🔴 <span id="risk-high">2</span> High impact<br>
-    🟠 <span id="risk-medium">1</span> Medium impact<br>
-    🔵 <span id="risk-low">2</span> Low impact
-  </div>
-</div>
+            <div class="card-head"><h2>Risk & issue overview</h2></div>
+            <div class="donut">
+              <div class="donut-inner">
+                <div><strong id="risk-total">5</strong><br><small>Total</small></div>
+              </div>
+            </div>
+            <div class="legend">
+              <div onclick="showRiskProjects('high')" style="cursor:pointer; padding:2px 0; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                🔴 <span id="risk-high">2</span> High impact
+              </div>
+              <div onclick="showRiskProjects('medium')" style="cursor:pointer; padding:2px 0; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                🟠 <span id="risk-medium">1</span> Medium impact
+              </div>
+              <div onclick="showRiskProjects('low')" style="cursor:pointer; padding:2px 0; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                🔵 <span id="risk-low">2</span> Low impact
+              </div>
+            </div>
+          </div>
 
           <div class="card">
             <div class="card-head"><h2>Upcoming milestones</h2></div>
@@ -1042,6 +1048,19 @@ td {
   </div>
 
   <div class="popup-body" id="popup-chat"></div>
+</div>
+
+<!-- MODAL POPUP UNTUK RISK DETAILS -->
+<div id="risk-modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:16px; width:90%; max-width:500px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.2); position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e9eef6; padding-bottom:12px; margin-bottom:15px;">
+      <h3 id="modal-title" style="margin:0; font-family:'Plus Jakarta Sans'; font-size:16px; color:#15213a;">Project Risk Details</h3>
+      <button onclick="closeRiskModal()" style="border:none; background:transparent; font-size:18px; cursor:pointer; color:#8492a9;">✕</button>
+    </div>
+    <div id="modal-project-list" style="max-height:300px; overflow-y:auto;">
+      <!-- Senarai projek dimasukkan melalui Javascript -->
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1406,6 +1425,77 @@ if ($("global-search")) {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeChat();
 });
+
+/* FUNGSI MODAL POPUP RISK LEVEL */
+function showRiskProjects(level) {
+  const modal = document.getElementById("risk-modal");
+  const modalTitle = document.getElementById("modal-title");
+  const projectListEl = document.getElementById("modal-project-list");
+  
+  if (!modal || !projectListEl) return;
+
+  const today = new Date();
+  
+  const filteredProjects = projects.filter(p => {
+    const status = (p.status || "").toLowerCase();
+    const progress = Number(p.progress) || 0;
+    
+    let diffDays = 999;
+    if (p.date && p.date !== "-") {
+      const targetDate = new Date(p.date);
+      if (!isNaN(targetDate.getTime())) {
+        diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+      }
+    }
+
+    if (level === 'high') {
+      return status.includes('risk') || (diffDays >= 0 && diffDays <= 7 && progress < 50);
+    } else if (level === 'medium') {
+      return (diffDays > 7 && diffDays <= 14) || status.includes('delay') || (progress >= 50 && progress < 70);
+    } else if (level === 'low') {
+      return !status.includes('risk') && !status.includes('delay') && (diffDays > 14 || progress >= 70);
+    }
+    return false;
+  });
+
+  const titles = {
+    high: "🔴 High Impact Projects",
+    medium: "🟠 Medium Impact Projects",
+    low: "🔵 Low Impact Projects"
+  };
+  modalTitle.textContent = titles[level] || "Project Details";
+
+  if (filteredProjects.length === 0) {
+    projectListEl.innerHTML = '<p style="color:#8492a9; text-align:center; padding:15px 0;">Tiada projek untuk tahap risiko ini.</p>';
+  } else {
+    projectListEl.innerHTML = filteredProjects.map(p => `
+      <div style="padding:12px 0; border-bottom:1px solid #f0f3f9; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <strong style="display:block; font-size:13px; color:#15213a;">${p.name}</strong>
+          <small style="color:#8492a9;">Owner: ${p.dept} | Target: ${p.date}</small>
+        </div>
+        <div style="text-align:right;">
+          ${getStatusBadge(p.status)}
+          <div style="font-size:11px; color:#8492a9; margin-top:4px;">Progress: ${p.progress}%</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  modal.style.display = "flex";
+}
+
+function closeRiskModal() {
+  const modal = document.getElementById("risk-modal");
+  if (modal) modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+  const modal = document.getElementById("risk-modal");
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+};
 
 setInterval(() => {
   fetchLiveProjects();
