@@ -362,17 +362,13 @@ td {
 }
 .lower-grid .card {margin:0}
 .donut {
-  width:100px;
-  height:100px;
-  margin:15px auto;
-  border-radius:50%;
-  background:conic-gradient(
-    #f45a63 0 40%,
-    #ffad45 40% 60%,
-    #4280ff 60% 100%
-  );
-  display:grid;
-  place-items:center;
+  width: 100px;
+  height: 100px;
+  margin: 15px auto;
+  border-radius: 50%;
+  /* background conic-gradient dibuang dari sini sebab kita guna inline style JS */
+  display: grid;
+  place-items: center;
 }
 .donut-inner {
   width:73px;
@@ -1140,7 +1136,6 @@ function updateRiskOverviewStats(projectsData) {
       }
     }
 
-    // Logik automatik High, Medium, Low berdasarkan baki hari & progress
     if (status.includes('risk') || (diffDays >= 0 && diffDays <= 7 && progress < 50)) {
       highCount++;
     } else if ((diffDays > 7 && diffDays <= 14) || status.includes('delay') || (progress >= 50 && progress < 70)) {
@@ -1152,11 +1147,29 @@ function updateRiskOverviewStats(projectsData) {
 
   const totalRisks = projectsData.length;
 
-  // Kemaskini elemen HTML Risk Overview
+  // Kemaskini teks nombor UI
   if ($("risk-total")) $("risk-total").textContent = totalRisks;
   if ($("risk-high")) $("risk-high").textContent = highCount;
   if ($("risk-medium")) $("risk-medium").textContent = mediumCount;
   if ($("risk-low")) $("risk-low").textContent = lowCount;
+
+  // KIRA DINAMIK CONIC-GRADIENT UNTUK DONUT CHART
+  const donutEl = document.querySelector('.donut');
+  if (donutEl) {
+    if (totalRisks === 0) {
+      donutEl.style.background = "#edf1f8"; // Jika tiada data, warna kelabu kosong
+    } else {
+      const highDeg = (highCount / totalRisks) * 360;
+      const mediumDeg = highDeg + (mediumCount / totalRisks) * 360;
+      const lowDeg = mediumDeg + (lowCount / totalRisks) * 360;
+
+      donutEl.style.background = `conic-gradient(
+        #f45a63 0deg ${highDeg}deg,
+        #ffad45 ${highDeg}deg ${mediumDeg}deg,
+        #4280ff ${mediumDeg}deg ${lowDeg}deg
+      )`;
+    }
+  }
 }
 
 /* 2. RENDER FUNCTION DENGAN CURRENT UPDATE & SYMBOL % */
