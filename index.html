@@ -1175,7 +1175,7 @@ async function fetchLiveProjects() {
 
           dept: row.dept || row.ProjectOwner || row.projectowner || row.cr4a6_projectowner || row.cr4a6_projectname || row.owner || "Azrin",
 
-          status: row.Status === 307920000 || row.status === 307920000 ? "Active" : (row.Status || row.status || "Active"),
+          status: row["Project Status"] || row.projectStatus || row.cr4a6_projectstatus || row.Status || row.status || "On Track",
 
           currentUpdate: row["Current update"] || row.currentUpdate || "Not started",
 
