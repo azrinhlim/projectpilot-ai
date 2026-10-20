@@ -388,12 +388,16 @@ td {
 .item {
   padding:8px 0;
   border-bottom:1px solid #f0f3f9;
+  transition: background 0.2s;
+}
+.item:hover {
+  background: #fdfefe;
 }
 .item:last-child {border-bottom:0}
 .item strong {font-size:11px}
 .item small {
   display:block;
-  margin-top:6px;
+  margin-top:4px;
   color:var(--muted);
   line-height:1.5;
 }
@@ -780,35 +784,19 @@ td {
             </div>
           </div>
 
+          <!-- DYNAMIC UPCOMING MILESTONES -->
           <div class="card">
             <div class="card-head"><h2>Upcoming milestones</h2></div>
-            <div class="item">
-              <strong>Complete facility design review</strong>
-              <small>Cafe at Main Branch · 25 Dec</small>
-            </div>
-            <div class="item">
-              <strong>Submit approval papers</strong>
-              <small>Office Renovation · 30 Nov</small>
-            </div>
-            <div class="item">
-              <strong>Finalise RFQ</strong>
-              <small>Walkie-Talkie Procurement · 15 Dec</small>
+            <div id="upcoming-milestones-container">
+              <div class="item"><small style="color:#8492a9;">Loading milestones...</small></div>
             </div>
           </div>
 
+          <!-- DYNAMIC RECENT ACTIVITY -->
           <div class="card">
             <div class="card-head"><h2>Recent activity</h2></div>
-            <div class="item">
-              <strong>RFQ draft prepared</strong>
-              <small>Office Renovation</small>
-            </div>
-            <div class="item">
-              <strong>Progress update recorded</strong>
-              <small>Cafe at Main Branch</small>
-            </div>
-            <div class="item">
-              <strong>Document uploaded</strong>
-              <small>Walkie-Talkie Procurement</small>
+            <div id="recent-activity-container">
+              <div class="item"><small style="color:#8492a9;">Loading recent activities...</small></div>
             </div>
           </div>
 
@@ -1050,7 +1038,7 @@ td {
   <div class="popup-body" id="popup-chat"></div>
 </div>
 
-<!-- MODAL POPUP UNTUK RISK DETAILS -->
+<!-- MODAL POPUP UNTUK RISK & PROJECT DETAILS -->
 <div id="risk-modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
   <div style="background:white; border-radius:16px; width:90%; max-width:500px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.2); position:relative;">
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e9eef6; padding-bottom:12px; margin-bottom:15px;">
@@ -1088,10 +1076,10 @@ const baseEmbedUrl = `https://copilotstudio.microsoft.com/environments/${envId}/
 const $=id=>document.getElementById(id);
 
 let projects = [
-  {name:"Cafe at Main Branch",dept:"Facilities",status:"On track",progress:75,owner:"SH",date:"25 Dec 2026",currentUpdate:"In progress"},
-  {name:"Office Renovation",dept:"Administration",status:"On track",progress:60,owner:"AK",date:"30 Nov 2026",currentUpdate:"In progress"},
-  {name:"Walkie-Talkie Procurement",dept:"Safety",status:"At risk",progress:40,owner:"ZR",date:"15 Dec 2026",currentUpdate:"Pending review"},
-  {name:"Document Digitisation",dept:"Operations",status:"Completed",progress:100,owner:"LT",date:"30 Sep 2026",currentUpdate:"Completed"}
+  {name:"Cafe at Main Branch",dept:"Facilities",status:"On track",progress:75,owner:"SH",date:"25 Dec 2026",currentUpdate:"Site review completed",currentStep:"Complete facility design review",nextTargetDate:"25 Dec 2026"},
+  {name:"Office Renovation",dept:"Administration",status:"On track",progress:60,owner:"AK",date:"30 Nov 2026",currentUpdate:"Draft RFQ prepared",currentStep:"Submit approval papers",nextTargetDate:"30 Nov 2026"},
+  {name:"Walkie-Talkie Procurement",dept:"Safety",status:"At risk",progress:40,owner:"ZR",date:"15 Dec 2026",currentUpdate:"Pending vendor response",currentStep:"Finalise RFQ",nextTargetDate:"15 Dec 2026"},
+  {name:"Document Digitisation",dept:"Operations",status:"Completed",progress:100,owner:"LT",date:"30 Sep 2026",currentUpdate:"Project completed",currentStep:"Project Sign-off",nextTargetDate:"30 Sep 2026"}
 ];
 
 function updateDashboardStats(projectsData) {
@@ -1110,8 +1098,9 @@ function updateDashboardStats(projectsData) {
 
   const today = new Date();
   const upcoming = projectsData.filter(p => {
-    if (!p.date || p.date === "-") return false;
-    const targetDate = new Date(p.date);
+    const targetStr = p.nextTargetDate || p.date;
+    if (!targetStr || targetStr === "-") return false;
+    const targetDate = new Date(targetStr);
     if (isNaN(targetDate.getTime())) return false;
     const diffTime = targetDate - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -1176,6 +1165,115 @@ function updateRiskOverviewStats(projectsData) {
       )`;
     }
   }
+}
+
+/* FUNGSI PAPARAN DINAMIK UPCOMING MILESTONES */
+function renderUpcomingMilestones(projectsData) {
+  const container = $("upcoming-milestones-container");
+  if (!container) return;
+
+  const today = new Date();
+
+  // Tapis projek yang ada NextStep/CurrentStep & Tarikh
+  let milestones = projectsData.map(p => {
+    const targetStr = p.nextTargetDate || p.date;
+    let diffDays = 999;
+    let formattedDate = targetStr;
+
+    if (targetStr && targetStr !== "-") {
+      const d = new Date(targetStr);
+      if (!isNaN(d.getTime())) {
+        diffDays = Math.ceil((d - today) / (1000 * 60 * 60 * 24));
+        formattedDate = d.toLocaleDateString("en-GB", { day: 'numeric', month: 'short' });
+      }
+    }
+
+    return {
+      projectName: p.name,
+      step: p.currentStep || "Next milestone review",
+      dateStr: formattedDate,
+      diffDays: diffDays,
+      rawProject: p
+    };
+  });
+
+  // Sort mengikut hari paling hampir
+  milestones.sort((a, b) => a.diffDays - b.diffDays);
+  const displayMilestones = milestones.slice(0, 3);
+
+  if (displayMilestones.length === 0) {
+    container.innerHTML = '<div class="item"><small style="color:#8492a9;">No upcoming milestones.</small></div>';
+    return;
+  }
+
+  container.innerHTML = displayMilestones.map(m => {
+    let badgeHtml = "";
+    if (m.diffDays < 0) {
+      badgeHtml = `<span style="background:#fde8e8; color:#e85b65; padding:2px 6px; border-radius:10px; font-size:9px; font-weight:700; margin-left:6px;">Overdue</span>`;
+    } else if (m.diffDays === 0) {
+      badgeHtml = `<span style="background:#fff1e5; color:#ce822b; padding:2px 6px; border-radius:10px; font-size:9px; font-weight:700; margin-left:6px;">Today</span>`;
+    } else if (m.diffDays <= 14) {
+      badgeHtml = `<span style="background:#e7f9f1; color:#009b75; padding:2px 6px; border-radius:10px; font-size:9px; font-weight:700; margin-left:6px;">In ${m.diffDays}d</span>`;
+    }
+
+    return `
+      <div class="item" onclick="showProjectDetails('${encodeURIComponent(m.projectName)}')" style="cursor:pointer;">
+        <strong>${m.step}</strong>
+        <small>${m.projectName} · ${m.dateStr} ${badgeHtml}</small>
+      </div>
+    `;
+  }).join('');
+}
+
+/* FUNGSI PAPARAN DINAMIK RECENT ACTIVITY */
+function renderRecentActivity(projectsData) {
+  const container = $("recent-activity-container");
+  if (!container) return;
+
+  const displayActivities = projectsData.slice(0, 3);
+
+  if (displayActivities.length === 0) {
+    container.innerHTML = '<div class="item"><small style="color:#8492a9;">No recent activity.</small></div>';
+    return;
+  }
+
+  container.innerHTML = displayActivities.map(p => {
+    const updateText = p.currentUpdate || "Progress update recorded";
+    return `
+      <div class="item" onclick="showProjectDetails('${encodeURIComponent(p.name)}')" style="cursor:pointer;">
+        <strong>${updateText}</strong>
+        <small>${p.name}</small>
+      </div>
+    `;
+  }).join('');
+}
+
+/* POPUP DETAIL APABILA ITEM KLIK */
+function showProjectDetails(encodedProjectName) {
+  const projName = decodeURIComponent(encodedProjectName);
+  const proj = projects.find(p => p.name === projName);
+  if (!proj) return;
+
+  const modal = document.getElementById("risk-modal");
+  const modalTitle = document.getElementById("modal-title");
+  const projectListEl = document.getElementById("modal-project-list");
+
+  if (!modal || !projectListEl) return;
+
+  modalTitle.textContent = `📋 ${proj.name}`;
+  projectListEl.innerHTML = `
+    <div style="padding:10px 0;">
+      <p style="margin:5px 0; font-size:12px; color:#55657e;"><strong>Owner / Department:</strong> ${proj.dept}</p>
+      <p style="margin:5px 0; font-size:12px; color:#55657e;"><strong>Status:</strong> ${getStatusBadge(proj.status)}</p>
+      <p style="margin:5px 0; font-size:12px; color:#55657e;"><strong>Progress:</strong> ${proj.progress}%</p>
+      <p style="margin:5px 0; font-size:12px; color:#55657e;"><strong>Target Completion:</strong> ${proj.date}</p>
+      <hr style="border:0; border-top:1px solid #f0f3f9; margin:12px 0;">
+      <p style="margin:5px 0; font-size:12px; color:#15213a;"><strong>Latest Update:</strong><br>${proj.currentUpdate || 'Tiada kemas kini'}</p>
+      <p style="margin:8px 0 0; font-size:12px; color:#15213a;"><strong>Next Step (Milestone):</strong><br>${proj.currentStep || 'Tiada next step'} <em>(${proj.nextTargetDate || '-'})</em></p>
+    </div>
+  `;
+
+  modal.style.display = "flex";
 }
 
 let isExpanded = false; 
@@ -1261,11 +1359,24 @@ async function fetchLiveProjects() {
           }
         }
 
+        let nextTargetDateText = "-";
+        const rawNextDate = row.nextTargetDate || row.NextTargetDate || row.cr4a6_nexttargetdate;
+        if (rawNextDate) {
+          const dNext = new Date(rawNextDate);
+          if (!isNaN(dNext.getTime())) {
+            nextTargetDateText = dNext.toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' });
+          } else {
+            nextTargetDateText = rawNextDate;
+          }
+        }
+
         return {
           name: row.name || row.Project || row.cr4a6_newcolumn || "Untitled Project",
           dept: row.dept || row.ProjectOwner || row.cr4a6_projectname || "Team",
           status: row.status || row["Project Status"] || row.cr4a6_projectstatus || "On Track",
           currentUpdate: row.currentUpdate || row["Current update"] || row.cr4a6_latestupdate || "Not started",
+          currentStep: row.currentStep || row.CurrentStep || row.cr4a6_currentstep || "Project setup",
+          nextTargetDate: nextTargetDateText,
           progress: (row.progress !== undefined && row.progress !== null) ? Number(row.progress) : ((row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : (Number(row.cr4a6_progress) || 0)),
           date: dateText
         };
@@ -1278,6 +1389,8 @@ async function fetchLiveProjects() {
 
       updateDashboardStats(projects);
       updateRiskOverviewStats(projects);
+      renderUpcomingMilestones(projects);
+      renderRecentActivity(projects);
 
       renderProjects("dash-projects");
       renderProjects("all-projects");
@@ -1289,6 +1402,8 @@ async function fetchLiveProjects() {
 
 renderProjects("dash-projects");
 renderProjects("all-projects");
+renderUpcomingMilestones(projects);
+renderRecentActivity(projects);
 fetchLiveProjects();
 
 if ($("dash-search")) {
