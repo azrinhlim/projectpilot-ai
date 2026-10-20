@@ -1050,6 +1050,21 @@ td {
 </div>
 
 <script>
+function getStatusBadge(statusText) {
+    if (!statusText) return '<span class="status track">On track</span>';
+    const s = statusText.trim().toLowerCase();
+    
+    if (s.includes('complet')) {
+        return `<span class="status done">${statusText}</span>`;
+    } else if (s.includes('risk')) {
+        return `<span class="status risk">${statusText}</span>`;
+    } else if (s.includes('delay')) {
+        return `<span class="status" style="background:#fde8e8;color:#e85b65;">${statusText}</span>`;
+    } else {
+        return `<span class="status track">${statusText}</span>`;
+    }
+}
+  
 /* WORKING GROUP 10 CONNECTION */
 const envId="37954b56-6662-eab5-8c43-065ce3edaff5";
 const botName="cr4a6_Group10";
@@ -1091,7 +1106,7 @@ function renderProjects(id, query = "") {
           ${p.name}
           <small>${p.dept}</small>
         </td>
-        <td><span class="status track">${p.status}</span></td>
+        <td>${getStatusBadge(p.status)}</td>
         <td><span style="color:#55657e; font-weight:500;">${p.currentUpdate}</span></td>
         <td>
           <div class="progress">
