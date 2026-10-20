@@ -1225,7 +1225,7 @@ function renderUpcomingMilestones(projectsData) {
   }).join('');
 }
 
-/* FUNGSI FORMAT MASA RELATIF (Contoh: 5m ago, 2h ago, Yesterday) */
+/* FUNGSI FORMAT MASA RELATIF */
 function formatTimeAgo(dateString) {
   if (!dateString) return "Recently";
   const date = new Date(dateString);
@@ -1246,16 +1246,21 @@ function formatTimeAgo(dateString) {
   return date.toLocaleDateString("en-GB", { day: 'numeric', month: 'short' });
 }
 
-/* FUNGSI PAPARAN RECENT ACTIVITY SUSUNAN MODIFIEDON */
+/* FUNGSI PAPARAN RECENT ACTIVITY TERKINI */
 function renderRecentActivity(projectsData) {
   const container = $("recent-activity-container");
   if (!container) return;
 
-  // Salin senarai projek & susun mengikut modifiedOn yang paling terbaharu (Descending)
+  // Salin & susun mengikut modifiedOn jika wujud
   const sortedProjects = [...projectsData].sort((a, b) => {
     const timeA = a.modifiedOn ? new Date(a.modifiedOn).getTime() : 0;
     const timeB = b.modifiedOn ? new Date(b.modifiedOn).getTime() : 0;
-    return timeB - timeA; // Paling baharu di atas
+    
+    // Jika kedua-duanya ada timestamp, susun terbaharu ke terlama
+    if (timeA > 0 && timeB > 0) {
+      return timeB - timeA;
+    }
+    return 0; // Kekalkan susunan asal jika tiada timestamp
   });
 
   const displayActivities = sortedProjects.slice(0, 3);
@@ -1409,7 +1414,7 @@ async function fetchLiveProjects() {
           nextTargetDate: nextTargetDateText,
           progress: (row.progress !== undefined && row.progress !== null) ? Number(row.progress) : ((row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : (Number(row.cr4a6_progress) || 0)),
           date: dateText,
-          modifiedOn: row.modifiedon || row.modifiedOn || row.ModifiedOn || row.cr4a6_modifiedon || null
+          modifiedOn: row.modifiedon || row.modifiedOn || row.ModifiedOn || row.cr4a6_modifiedon || row._updatedAt || row.updatedAt || null
         };
       });
 
