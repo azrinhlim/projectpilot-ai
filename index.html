@@ -766,18 +766,18 @@ td {
         <div class="lower-grid">
 
           <div class="card">
-            <div class="card-head"><h2>Risk & issue overview</h2></div>
-            <div class="donut">
-              <div class="donut-inner">
-                <div><strong>5</strong><br><small>Total</small></div>
-              </div>
-            </div>
-            <div class="legend">
-              🔴 2 High impact<br>
-              🟠 1 Medium impact<br>
-              🔵 2 Low impact
-            </div>
-          </div>
+  <div class="card-head"><h2>Risk & issue overview</h2></div>
+  <div class="donut">
+    <div class="donut-inner">
+      <div><strong id="risk-total">5</strong><br><small>Total</small></div>
+    </div>
+  </div>
+  <div class="legend">
+    🔴 <span id="risk-high">2</span> High impact<br>
+    🟠 <span id="risk-medium">1</span> Medium impact<br>
+    🔵 <span id="risk-low">2</span> Low impact
+  </div>
+</div>
 
           <div class="card">
             <div class="card-head"><h2>Upcoming milestones</h2></div>
@@ -1119,6 +1119,46 @@ function updateDashboardStats(projectsData) {
   if ($("stat-upcoming")) $("stat-upcoming").textContent = upcoming;
 }
 
+/* FUNGSI KIRA & UPDATE RISK & ISSUE OVERVIEW (CARA 1) */
+function updateRiskOverviewStats(projectsData) {
+  if (!projectsData || !Array.isArray(projectsData)) return;
+
+  const today = new Date();
+  let highCount = 0;
+  let mediumCount = 0;
+  let lowCount = 0;
+
+  projectsData.forEach(p => {
+    const status = (p.status || "").toLowerCase();
+    const progress = Number(p.progress) || 0;
+    
+    let diffDays = 999;
+    if (p.date && p.date !== "-") {
+      const targetDate = new Date(p.date);
+      if (!isNaN(targetDate.getTime())) {
+        diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+      }
+    }
+
+    // Logik automatik High, Medium, Low berdasarkan baki hari & progress
+    if (status.includes('risk') || (diffDays >= 0 && diffDays <= 7 && progress < 50)) {
+      highCount++;
+    } else if ((diffDays > 7 && diffDays <= 14) || status.includes('delay') || (progress >= 50 && progress < 70)) {
+      mediumCount++;
+    } else {
+      lowCount++;
+    }
+  });
+
+  const totalRisks = projectsData.length;
+
+  // Kemaskini elemen HTML Risk Overview
+  if ($("risk-total")) $("risk-total").textContent = totalRisks;
+  if ($("risk-high")) $("risk-high").textContent = highCount;
+  if ($("risk-medium")) $("risk-medium").textContent = mediumCount;
+  if ($("risk-low")) $("risk-low").textContent = lowCount;
+}
+
 /* 2. RENDER FUNCTION DENGAN CURRENT UPDATE & SYMBOL % */
 let isExpanded = false; 
 
@@ -1221,8 +1261,9 @@ async function fetchLiveProjects() {
         totalStat.textContent = projects.length;
       }
 
-      // Kemaskini semua kad statistik automatik
+      // Kemaskini semua kad statistik dan kad risk secara automatik
       updateDashboardStats(projects);
+      updateRiskOverviewStats(projects);
 
       renderProjects("dash-projects");
       renderProjects("all-projects");
