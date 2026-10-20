@@ -709,32 +709,32 @@ td {
   </div>
 
   <!-- OVERVIEW -->
-  <section class="page active" id="page-overview">
+<section class="page active" id="page-overview">
 
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-icon blue"><i class="icon icon-folder"></i></div>
-        <strong>12</strong>
-        <small>Total projects</small>
-      </div>
-      <div class="stat">
-        <div class="stat-icon green"><i class="icon icon-circle-check"></i></div>
-        <strong>8</strong>
-        <small>On track</small>
-      </div>
-      <div class="stat">
-        <div class="stat-icon orange"><i class="icon icon-triangle-alert"></i></div>
-        <strong>3</strong>
-        <small>At risk</small>
-      </div>
-      <div class="stat">
-        <div class="stat-icon purple"><i class="icon icon-calendar-days"></i></div>
-        <strong>2</strong>
-        <small>Upcoming deadlines</small>
-      </div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-icon blue"><i class="icon icon-folder"></i></div>
+      <strong id="stat-total">0</strong>
+      <small>Total projects</small>
     </div>
+    <div class="stat">
+      <div class="stat-icon green"><i class="icon icon-circle-check"></i></div>
+      <strong id="stat-ontrack">0</strong>
+      <small>On track</small>
+    </div>
+    <div class="stat">
+      <div class="stat-icon orange"><i class="icon icon-triangle-alert"></i></div>
+      <strong id="stat-atrisk">0</strong>
+      <small>At risk</small>
+    </div>
+    <div class="stat">
+      <div class="stat-icon purple"><i class="icon icon-calendar-days"></i></div>
+      <strong id="stat-upcoming">0</strong>
+      <small>Upcoming deadlines</small>
+    </div>
+  </div>
 
-    <div class="dashboard-grid">
+  <div class="dashboard-grid">
 
       <!-- LEFT CONTENT -->
       <div>
@@ -1082,6 +1082,43 @@ let projects = [
   {name:"Document Digitisation",dept:"Operations",status:"Completed",progress:100,owner:"LT",date:"30 Sep 2026"}
 ];
 
+/* FUNGSI KIRA & UPDATE KAD STATISTIK DASHBOARD */
+function updateDashboardStats(projectsData) {
+  if (!projectsData || !Array.isArray(projectsData)) return;
+
+  // 1. Total Projects
+  const total = projectsData.length;
+
+  // 2. On Track Count
+  const onTrack = projectsData.filter(p => {
+    const s = (p.status || "").trim().toLowerCase();
+    return s.includes('track') || s.includes('on track');
+  }).length;
+
+  // 3. At Risk Count
+  const atRisk = projectsData.filter(p => {
+    const s = (p.status || "").trim().toLowerCase();
+    return s.includes('risk');
+  }).length;
+
+  // 4. Upcoming Deadlines (Projek yang due dalam tempoh 14 hari akan datang)
+  const today = new Date();
+  const upcoming = projectsData.filter(p => {
+    if (!p.date || p.date === "-") return false;
+    const targetDate = new Date(p.date);
+    if (isNaN(targetDate.getTime())) return false;
+    const diffTime = targetDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays <= 14;
+  }).length;
+
+  // Kemaskini elemen HTML mengikut ID
+  if ($("stat-total")) $("stat-total").textContent = total;
+  if ($("stat-ontrack")) $("stat-ontrack").textContent = onTrack;
+  if ($("stat-atrisk")) $("stat-atrisk").textContent = atRisk;
+  if ($("stat-upcoming")) $("stat-upcoming").textContent = upcoming;
+}
+
 /* 2. RENDER FUNCTION DENGAN CURRENT UPDATE & SYMBOL % */
 let isExpanded = false; 
 
@@ -1168,23 +1205,14 @@ async function fetchLiveProjects() {
         }
 
         return {
-
           name: row.Project || row.name || "Untitled Project",
-
-          // Menyemak pelbagai kemungkinan nama key untuk owner dari Power Automate / JSONBin
-
           dept: row.dept || row.ProjectOwner || row.projectowner || row.cr4a6_projectowner || row.cr4a6_projectname || row.owner || "Azrin",
-
           status: row["Project Status"] || row.projectStatus || row.cr4a6_projectstatus || row.Status || row.status || "On Track",
-
           currentUpdate: row["Current update"] || row.currentUpdate || "Not started",
-
           progress: (row.progress !== undefined && row.progress !== null) ? Number(row.progress) : ((row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : 0),
-
           date: (row["Target Completion Date"] || row["Target date"] || row.TargetCompletionDate || row.cr4a6_targetcompletiondate || row.date) 
       ? String(row["Target Completion Date"] || row["Target date"] || row.TargetCompletionDate || row.cr4a6_targetcompletiondate || row.date).split('T')[0] 
       : "-"
-
         };
       });
 
@@ -1192,6 +1220,9 @@ async function fetchLiveProjects() {
       if (totalStat) {
         totalStat.textContent = projects.length;
       }
+
+      // Kemaskini semua kad statistik automatik
+      updateDashboardStats(projects);
 
       renderProjects("dash-projects");
       renderProjects("all-projects");
