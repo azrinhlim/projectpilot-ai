@@ -1522,7 +1522,25 @@ document.querySelectorAll("[data-goto]").forEach(b =>
 if ($("open-workspace")) $("open-workspace").onclick = () => setPage("assistant");
 
 document.querySelectorAll("[data-insight]").forEach(b => {
-  b.onclick = () => setPage("assistant");
+  b.onclick = () => {
+    const insightType = b.dataset.insight;
+    let promptText = "Please summarize our projects."; // Default
+    
+    if (insightType === "summary") {
+      promptText = "Please give me a comprehensive summary of all active projects, including their overall progress and current status.";
+    } else if (insightType === "risks") {
+      promptText = "Please identify and analyze the high-impact risks and issues across all active projects right now.";
+    } else if (insightType === "actions") {
+      promptText = "Based on the current project portfolio data, what are the recommended next actions for the project managers?";
+    }
+
+    // Tukar halaman ke assistant dan hantar teks secara automatik ke bot Copilot Studio
+    setPage("assistant");
+    
+    // URL Copilot Studio dengan parameter teks automatik (pva_text)
+    const customPromptUrl = baseEmbedUrl + "&pva_text=" + encodeURIComponent(promptText);
+    loadChat("full-chat", customPromptUrl);
+  };
 });
 
 if ($("sidebar-toggle")) {
