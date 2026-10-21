@@ -1424,56 +1424,7 @@ async function fetchLiveProjects() {
         return {
           name: row.name || row.Project || row.cr4a6_newcolumn || "Untitled Project",
           dept: row.dept || row.ProjectOwner || row.cr4a6_projectname || "Team",
-          status: (() => {
-  let rawStatus = row.status || row["Project Status"] || row.cr4a6_projectstatus || "";
-  let progress = Number(row.progress || row.Progress || row.cr4a6_progress || 0);
-  let targetDateStr = row.date || row.TargetCompletionDate || row.cr4a6_targetcompletiondate;
-  let createdDateStr = row.createdon || row.createdOn || row.CreatedOn || row.cr4a6_createdon;
-  
-  // 1. Mirror syarat Completed (jika progress = 100)
-  if (progress === 100 || (rawStatus && rawStatus.toLowerCase().includes('complet'))) {
-    return "Completed";
-  }
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // 2. Mirror syarat Delayed (tarikh hari ni > target date)
-  if (targetDateStr && targetDateStr !== "-") {
-    let targetDate = new Date(targetDateStr);
-    targetDate.setHours(0, 0, 0, 0);
-    if (!isNaN(targetDate.getTime()) && today > targetDate) {
-      return "Delayed";
-    }
-  }
-
-  // 3. Mirror syarat At Risk (pengiraan jurang masa vs progress seperti formula flow)
-  if (targetDateStr && createdDateStr && targetDateStr !== "-" && createdDateStr !== "-") {
-    let targetDate = new Date(targetDateStr);
-    let createdDate = new Date(createdDateStr);
-    
-    if (!isNaN(targetDate.getTime()) && !isNaN(createdDate.getTime())) {
-      let totalTicks = targetDate.getTime() - createdDate.getTime();
-      let elapsedTicks = today.getTime() - createdDate.getTime();
-      
-      if (totalTicks > 0) {
-        let expectedProgress = (elapsedTicks / totalTicks) * 100;
-        // Jika progress sebenar jauh tertinggal berbanding jangkaan masa (jurang >= 15%)
-        if ((expectedProgress - progress) >= 15) {
-          return "At Risk";
-        }
-      }
-    }
-  }
-
-  // Fallback jika status asal ada sebut 'risk'
-  if (rawStatus && rawStatus.toLowerCase().includes('risk')) {
-    return "At Risk";
-  }
-
-  // 4. Default kepada On Track
-  return rawStatus ? rawStatus : "On Track";
-})(),
+          status: row.status || row["Project Status"] || row.cr4a6_projectstatus || "On Track",
           currentUpdate: row.currentUpdate || row["Current update"] || row.cr4a6_latestupdate || "Not started",
           currentStep: row.currentStep || row.CurrentStep || row.cr4a6_currentstep || "Project setup",
           nextTargetDate: nextTargetDateText,
