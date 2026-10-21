@@ -406,70 +406,7 @@ td {
   font-size:11px;
   line-height:1.7;
 }
-
-/* AI INSIGHTS */
-.insights-card {
-  background:linear-gradient(160deg,#f9fbff,#ffffff);
-}
-.insight-heading {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin-bottom:18px;
-}
-.insight-heading .logo {
-  width:42px;
-  height:42px;
-}
-.insight-heading strong {
-  display:block;
-  font:800 15px "Plus Jakarta Sans";
-}
-.insight-heading small {
-  display:block;
-  color:var(--muted);
-  margin-top:5px;
-}
-.insight-intro {
-  color:#5d6d87;
-  line-height:1.8;
-  font-size:12px;
-  margin-bottom:20px;
-}
-.insight-action {
-  width:100%;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  text-align:left;
-  border:1px solid var(--border);
-  background:white;
-  border-radius:10px;
-  padding:14px 13px;
-  margin-bottom:10px;
-  color:#253650;
-  font-size:11px;
-  font-weight:700;
-  transition:background .2s,border-color .2s;
-}
-.insight-action:hover {
-  border-color:#b7ccff;
-  background:#f9fbff;
-}
-.insight-action i {
-  font-size:18px;
-  color:var(--blue);
-}
-.insight-action span {flex:1}
-.insight-action .arrow {color:#a6b2c4}
-.insight-footer {
-  margin-top:18px;
-  padding-top:16px;
-  border-top:1px solid var(--border);
-  color:#8b99ad;
-  font-size:10px;
-  line-height:1.7;
-}
+  
 .quick-card {
   padding:22px;
 }
@@ -807,51 +744,7 @@ td {
         </p>
 
       </div>
-
-      <!-- RIGHT CONTENT: AI INSIGHTS, NOT CHAT -->
-      <div>
-
-        <div class="card insights-card">
-
-          <div class="insight-heading">
-            <img src="IMG_5286.PNG" alt="Logo" style="width: 42px; height: 42px; border-radius: 13px; object-fit: cover; flex: none;">
-            <div>
-              <strong>AI Project Insights</strong>
-              <small>Powered by PANTAS</small>
-            </div>
-          </div>
-
-          <p class="insight-intro">
-            Get a clearer picture of project delivery. Ask PANTAS to
-            review project progress, highlight potential risks and
-            recommend your next actions.
-          </p>
-
-          <button class="insight-action" data-insight="summary">
-            <i class="icon icon-chart-column"></i>
-            <span>Summarize projects</span>
-            <i class="icon icon-chevron-right arrow"></i>
-          </button>
-
-          <button class="insight-action" data-insight="risks">
-            <i class="icon icon-triangle-alert" style="color:#e95c67"></i>
-            <span>Identify risks & issues</span>
-            <i class="icon icon-chevron-right arrow"></i>
-          </button>
-
-          <button class="insight-action" data-insight="actions">
-            <i class="icon icon-list-checks" style="color:#00a77e"></i>
-            <span>Recommend next actions</span>
-            <i class="icon icon-chevron-right arrow"></i>
-          </button>
-
-          <div class="insight-footer">
-            Select an action to open the live PANTAS assistant.
-            Enter your request directly in the Microsoft chat.
-          </div>
-
-        </div>
-
+    
         <div class="card quick-card">
           <div class="card-head">
             <h2>AI Assistant Workspace</h2>
