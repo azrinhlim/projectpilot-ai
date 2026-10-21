@@ -1085,18 +1085,34 @@ let projects = [
 function updateDashboardStats(projectsData) {
   if (!projectsData || !Array.isArray(projectsData)) return;
 
-  const total = projectsData.length;
-  const onTrack = projectsData.filter(p => {
-    const s = (p.status || "").trim().toLowerCase();
-    return s.includes('track') || s.includes('on track');
-  }).length;
-
-  const atRisk = projectsData.filter(p => {
-    const s = (p.status || "").trim().toLowerCase();
-    return s.includes('risk');
-  }).length;
-
   const today = new Date();
+  const total = projectsData.length;
+
+  let onTrack = 0;
+  let atRisk = 0;
+
+  projectsData.forEach(p => {
+    const s = (p.status || "").trim().toLowerCase();
+    const progress = Number(p.progress) || 0;
+    
+    let diffDays = 999;
+    if (p.date && p.date !== "-") {
+      const targetDate = new Date(p.date);
+      if (!isNaN(targetDate.getTime())) {
+        diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+      }
+    }
+
+    // Gunakan syarat yang selari dengan Risk Overview
+    if (s.includes('risk') || (diffDays >= 0 && diffDays <= 7 && progress < 50)) {
+      atRisk++;
+    } else if (s.includes('track') || s.includes('on track') || progress >= 50) {
+      onTrack++;
+    } else {
+      onTrack++;
+    }
+  });
+
   const upcoming = projectsData.filter(p => {
     const targetStr = p.nextTargetDate || p.date;
     if (!targetStr || targetStr === "-") return false;
