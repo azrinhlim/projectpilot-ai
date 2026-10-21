@@ -293,10 +293,8 @@ h2 {
 
 /* DASHBOARD */
 .dashboard-grid {
-  display:grid;
-  grid-template-columns:minmax(0,1.75fr) minmax(300px,.85fr);
-  gap:20px;
-  align-items:start;
+  display: block;
+  width: 100%;
 }
 .search {
   width:100%;
@@ -360,7 +358,7 @@ td {
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:16px;
 }
-.lower-grid .card {margin:0}
+.lower-grid .card {margin:0; height:100%;}
 .donut {
   width: 100px;
   height: 100px;
@@ -405,6 +403,7 @@ td {
   color:#98a5b7;
   font-size:11px;
   line-height:1.7;
+  margin-top: 15px;
 }
   
 .quick-card {
@@ -533,9 +532,6 @@ td {
 .popup-body {flex:1;min-height:0}
 
 /* RESPONSIVE */
-@media(max-width:1250px) {
-  .dashboard-grid {grid-template-columns:1fr}
-}
 @media(max-width:950px) {
   .stats {grid-template-columns:repeat(2,minmax(0,1fr))}
   .lower-grid {grid-template-columns:1fr 1fr}
@@ -645,34 +641,34 @@ td {
   </div>
 
   <!-- OVERVIEW -->
-<section class="page active" id="page-overview">
+  <section class="page active" id="page-overview">
 
-  <div class="stats">
-  <div class="stat">
-    <div class="stat-icon blue"><i class="icon icon-folder"></i></div>
-    <strong id="stat-total">0</strong>
-    <small>Total projects</small>
-  </div>
-  <div class="stat">
-    <div class="stat-icon green"><i class="icon icon-circle-check"></i></div>
-    <strong id="stat-ontrack">0</strong>
-    <small>On track</small>
-  </div>
-  <div class="stat">
-    <div class="stat-icon orange"><i class="icon icon-triangle-alert"></i></div>
-    <strong id="stat-atrisk">0</strong>
-    <small>At risk</small>
-  </div>
-  <div class="stat">
-    <div class="stat-icon purple"><i class="icon icon-calendar-days"></i></div>
-    <strong id="stat-upcoming">0</strong>
-    <small>Upcoming deadlines</small>
-  </div>
-</div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-icon blue"><i class="icon icon-folder"></i></div>
+        <strong id="stat-total">0</strong>
+        <small>Total projects</small>
+      </div>
+      <div class="stat">
+        <div class="stat-icon green"><i class="icon icon-circle-check"></i></div>
+        <strong id="stat-ontrack">0</strong>
+        <small>On track</small>
+      </div>
+      <div class="stat">
+        <div class="stat-icon orange"><i class="icon icon-triangle-alert"></i></div>
+        <strong id="stat-atrisk">0</strong>
+        <small>At risk</small>
+      </div>
+      <div class="stat">
+        <div class="stat-icon purple"><i class="icon icon-calendar-days"></i></div>
+        <strong id="stat-upcoming">0</strong>
+        <small>Upcoming deadlines</small>
+      </div>
+    </div>
 
-  <div class="dashboard-grid">
+    <div class="dashboard-grid">
 
-      <!-- LEFT CONTENT -->
+      <!-- MAIN FULL WIDTH CONTENT -->
       <div>
 
         <div class="card">
@@ -742,24 +738,6 @@ td {
         <p class="sample-note">
           Dashboard figures and project information are illustrative and not yet connected to Dataverse.
         </p>
-
-      </div>
-    
-        <div class="card quick-card">
-          <div class="card-head">
-            <h2>AI Assistant Workspace</h2>
-            <i class="icon icon-sparkles" style="color:#7a61ef;font-size:20px"></i>
-          </div>
-
-          <p>
-            Need help planning a project, updating progress or
-            preparing documents? Work directly with PANTAS.
-          </p>
-
-          <button class="primary" id="open-workspace">
-            <i class="icon icon-sparkles"></i> Open AI Assistant
-          </button>
-        </div>
 
       </div>
 
@@ -998,7 +976,6 @@ function updateDashboardStats(projectsData) {
       }
     }
 
-    // Gunakan syarat yang selari dengan Risk Overview
     if (s.includes('risk') || (diffDays >= 0 && diffDays <= 7 && progress < 50)) {
       atRisk++;
     } else if (s.includes('track') || s.includes('on track') || progress >= 50) {
@@ -1085,7 +1062,6 @@ function renderUpcomingMilestones(projectsData) {
 
   const today = new Date();
 
-  // Tapis projek yang ada NextStep/CurrentStep & Tarikh
   let milestones = projectsData.map(p => {
     const targetStr = p.nextTargetDate || p.date;
     let diffDays = 999;
@@ -1108,7 +1084,6 @@ function renderUpcomingMilestones(projectsData) {
     };
   });
 
-  // Sort mengikut hari paling hampir
   milestones.sort((a, b) => a.diffDays - b.diffDays);
   const displayMilestones = milestones.slice(0, 3);
 
@@ -1162,16 +1137,14 @@ function renderRecentActivity(projectsData) {
   const container = $("recent-activity-container");
   if (!container) return;
 
-  // Salin & susun mengikut modifiedOn jika wujud
   const sortedProjects = [...projectsData].sort((a, b) => {
     const timeA = a.modifiedOn ? new Date(a.modifiedOn).getTime() : 0;
     const timeB = b.modifiedOn ? new Date(b.modifiedOn).getTime() : 0;
     
-    // Jika kedua-duanya ada timestamp, susun terbaharu ke terlama
     if (timeA > 0 && timeB > 0) {
       return timeB - timeA;
     }
-    return 0; // Kekalkan susunan asal jika tiada timestamp
+    return 0;
   });
 
   const displayActivities = sortedProjects.slice(0, 3);
@@ -1414,28 +1387,6 @@ document.querySelectorAll("[data-goto]").forEach(b =>
 
 if ($("open-workspace")) $("open-workspace").onclick = () => setPage("assistant");
 
-document.querySelectorAll("[data-insight]").forEach(b => {
-  b.onclick = () => {
-    const insightType = b.dataset.insight;
-    let promptText = "Please summarize our projects."; // Default
-    
-    if (insightType === "summary") {
-      promptText = "Please give me a comprehensive summary of all active projects, including their overall progress and current status.";
-    } else if (insightType === "risks") {
-      promptText = "Please identify and analyze the high-impact risks and issues across all active projects right now.";
-    } else if (insightType === "actions") {
-      promptText = "Based on the current project portfolio data, what are the recommended next actions for the project managers?";
-    }
-
-    // Tukar halaman ke assistant dan hantar teks secara automatik ke bot Copilot Studio
-    setPage("assistant");
-    
-    // URL Copilot Studio dengan parameter teks automatik (pva_text)
-    const customPromptUrl = baseEmbedUrl + "&pva_text=" + encodeURIComponent(promptText);
-    loadChat("full-chat", customPromptUrl);
-  };
-});
-
 if ($("sidebar-toggle")) {
   $("sidebar-toggle").onclick = () => $("sidebar").classList.toggle("collapsed");
 }
@@ -1576,10 +1527,6 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 };
-
-//setInterval(() => {
-  //fetchLiveProjects();
-//}, 3000);
 </script>
 
 </body>
