@@ -3,1403 +3,869 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#ffffff">
-<title>ProjectPilot AI | Project Command Center</title>
-
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/lucide-static@latest/font/lucide.css" rel="stylesheet">
-
+<title>Project Delivery Workspace | ProjectPilot AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --white:#ffffff;
-  --bg:#ffffff;
-  --ink:#15213a;
-  --muted:#8492a9;
-  --border:#e9eef6;
-  --blue:#3d78f6;
-  --purple:#865cf6;
-  --green:#00a77e;
-  --orange:#e99035;
-  --red:#e85b65;
-  --soft:#f8faff;
-  --shadow:0 8px 30px rgba(35,62,105,.035);
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+  color: #101e46;
+  background: #f7f9ff;
+  --blue: #326df8;
+  --purple: #7847f7;
+  --border: #e7ebf6;
+  --muted: #8190ac;
 }
-* {box-sizing:border-box}
-html {scroll-behavior:smooth}
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font:13px "DM Sans",sans-serif;
-}
-button,input {font:inherit}
-button {cursor:pointer}
-button:focus-visible,input:focus-visible {
-  outline:3px solid #bad0ff;
-  outline-offset:2px;
-}
-.app {display:flex;min-height:100vh}
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+
+.shell { display: flex; min-height: 100vh; }
 
 /* SIDEBAR */
 .sidebar {
-  width:235px;
-  flex:none;
-  height:100vh;
-  position:sticky;
-  top:0;
-  display:flex;
-  flex-direction:column;
-  background:white;
-  border-right:1px solid var(--border);
-  transition:width .25s ease;
-  overflow:hidden;
-  z-index:10;
-}
-.sidebar.collapsed {width:72px}
-.brand {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:25px 18px 34px;
-  white-space:nowrap;
+  width: 72px;
+  background: white;
+  border-right: 1px solid #e7ecf7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 9px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 10;
 }
 .logo {
-  width:40px;
-  height:40px;
-  flex:none;
-  border-radius:13px;
-  background:linear-gradient(135deg,#4486ff,#925bff);
-  color:white;
-  display:grid;
-  place-items:center;
-  font-size:23px;
-  box-shadow:0 6px 18px rgba(99,106,240,.18);
-}
-.brand strong {
-  display:block;
-  font:800 15px "Plus Jakarta Sans";
-  letter-spacing:-.4px;
-}
-.brand small {
-  display:block;
-  margin-top:4px;
-  color:var(--muted);
-  font-size:10px;
-}
-.navigation {
-  display:grid;
-  gap:5px;
-  padding:0 10px;
-}
-.nav-btn {
-  border:0;
-  background:transparent;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  height:45px;
-  width:100%;
-  border-radius:11px;
-  padding:0 15px;
-  color:#596b88;
-  text-align:left;
-  font-weight:700;
-  white-space:nowrap;
-}
-.nav-btn:hover {background:#f7f9ff}
-.nav-btn.active {
-  background:#edf3ff;
-  color:#286cf3;
-}
-.nav-btn i {
-  width:20px;
-  text-align:center;
-  font-size:18px;
-}
-.sidebar.collapsed .brand-text,
-.sidebar.collapsed .nav-label,
-.sidebar.collapsed .side-note {display:none}
-.sidebar.collapsed .nav-btn {
-  justify-content:center;
-  padding:0;
-}
-.side-footer {
-  margin-top:auto;
-  padding:15px;
-}
-.side-note {
-  background:#f8faff;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:14px;
-  line-height:1.7;
-}
-.side-note small {
-  display:block;
-  color:var(--muted);
-  margin-top:5px;
-}
-.collapse-btn {
-  margin-top:10px;
-  width:40px;
-  height:40px;
-  border:1px solid var(--border);
-  border-radius:11px;
-  background:white;
-  color:#637796;
-}
-.sidebar.collapsed .collapse-btn {
-  display:block;
-  margin:10px auto 0;
-}
-
-/* MAIN */
-.main {
-  flex:1;
-  min-width:0;
-  padding:28px clamp(18px,3vw,52px) 70px;
-}
-.topbar {
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:18px;
-  margin-bottom:30px;
-}
-.top-search {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  width:320px;
-  max-width:100%;
-  padding:8px 12px;
-  border:1px solid var(--border);
-  background:#fafbff;
-  border-radius:10px;
-  color:#8290a8;
-}
-.top-search input {
-  border:0;
-  background:transparent;
-  outline:0;
-  width:100%;
-  font-size:13px;
-  color:var(--ink);
-}
-.profile {
-  width:37px;
-  height:37px;
-  border-radius:50%;
-  background:#edf3ff;
-  display:grid;
-  place-items:center;
-  color:#58729d;
-  font-weight:800;
-}
-.welcome {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:20px;
-  margin-bottom:26px;
-}
-.eyebrow {
-  color:#7183a1;
-  font-size:12px;
-}
-h1 {
-  font:800 clamp(23px,2.5vw,32px) "Plus Jakarta Sans";
-  letter-spacing:-1px;
-  margin:9px 0;
-}
-.subtitle {
-  color:var(--muted);
-  margin:0;
-  line-height:1.6;
-}
-.primary {
-  border:0;
-  border-radius:11px;
-  padding:13px 19px;
-  background:linear-gradient(115deg,#4382fa,#855af3);
-  color:white;
-  font-weight:700;
-  white-space:nowrap;
-  box-shadow:0 8px 22px rgba(77,111,235,.17);
-}
-.primary i {margin-right:7px}
-.page {display:none}
-.page.active {display:block}
-
-/* CARDS */
-.card,.stat {
-  background:white;
-  border:1px solid var(--border);
-  border-radius:17px;
-  box-shadow:var(--shadow);
-}
-.card {
-  padding:22px;
-  margin-bottom:20px;
-}
-.card-head {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:18px;
-}
-h2 {
-  margin:0;
-  font:800 15px "Plus Jakarta Sans";
-  letter-spacing:-.3px;
-}
-.link-btn {
-  background:transparent;
-  border:0;
-  color:var(--blue);
-  font-size:11px;
-  font-weight:700;
-}
-.stats {
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:17px;
-  margin-bottom:20px;
-}
-.stat {padding:21px}
-.stat-icon {
-  width:46px;
-  height:46px;
-  border-radius:14px;
-  display:grid;
-  place-items:center;
-  font-size:21px;
-  margin-bottom:14px;
-}
-.stat-icon.blue {background:#eaf2ff;color:var(--blue)}
-.stat-icon.green {background:#e8f9f3;color:var(--green)}
-.stat-icon.orange {background:#fff2e6;color:var(--orange)}
-.stat-icon.purple {background:#f1ebff;color:var(--purple)}
-.stat strong {
-  display:block;
-  font:800 29px "Plus Jakarta Sans";
-}
-.stat small {
-  display:block;
-  color:var(--muted);
-  margin-top:7px;
-}
-
-/* DASHBOARD */
-.dashboard-grid {
-  display: block;
-  width: 100%;
-}
-.search {
-  width:100%;
-  padding:10px 13px;
-  border:1px solid var(--border);
-  background:#fbfcff;
-  border-radius:10px;
-  margin-bottom:13px;
-  outline-color:#b6caff;
-}
-.table-wrap {overflow-x:auto}
-table {
-  border-collapse:collapse;
-  width:100%;
-  min-width:590px;
-}
-th {
-  text-align:left;
-  padding:10px 9px;
-  font-size:10px;
-  color:var(--muted);
-}
-td {
-  border-top:1px solid #f0f3f9;
-  padding:14px 9px;
-  font-size:11px;
-}
-.project-name {font-weight:700}
-.project-name small {
-  display:block;
-  margin-top:5px;
-  font-weight:400;
-  color:var(--muted);
-}
-.status {
-  display:inline-block;
-  border-radius:20px;
-  padding:6px 10px;
-  font-size:10px;
-  font-weight:700;
-  white-space:nowrap;
-}
-.status.track {background:#e7f9f1;color:#009b75}
-.status.risk {background:#fff1e5;color:#ce822b}
-.status.done {background:#e7f9f1;color:#009b75}
-.progress {
-  width:85px;
-  height:6px;
-  border-radius:10px;
-  overflow:hidden;
-  background:#edf1f8;
-}
-.progress span {
-  display:block;
-  height:100%;
-  background:#4d83ff;
-  border-radius:10px;
-}
-.lower-grid {
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:16px;
-}
-.lower-grid .card {margin:0; height:100%;}
-.donut {
-  width: 100px;
-  height: 100px;
-  margin: 15px auto;
-  border-radius: 50%;
+  background: linear-gradient(135deg, #2268ff, #8639ff);
+  color: white;
+  border-radius: 14px;
+  font-weight: 900;
+  padding: 11px;
+  font-size: 18px;
   display: grid;
   place-items: center;
 }
-.donut-inner {
-  width:73px;
-  height:73px;
-  border-radius:50%;
-  background:white;
-  display:grid;
-  place-items:center;
-  text-align:center;
+.nav {
+  width: 46px;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #667598;
+  font-size: 20px;
+  transition: all 0.2s;
 }
-.donut-inner strong {font-size:22px}
-.donut-inner small {font-size:9px;color:var(--muted)}
-.legend {
-  font-size:10px;
-  color:#7484a0;
-  line-height:2.1;
+.nav.active, .nav:hover {
+  background: #eaf0ff;
+  color: #3066f5;
 }
-.item {
-  padding:8px 0;
-  border-bottom:1px solid #f0f3f9;
-  transition: background 0.2s;
+
+/* MAIN CONTENT */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 30px 34px;
+  max-width: 1800px;
+  margin: auto;
 }
-.item:hover {
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+  background: radial-gradient(circle at 83% 20%, #dcd7ff, transparent 36%), linear-gradient(110deg, #f8fbff, #e9f1ff);
+  border-radius: 23px;
+  padding: 28px 30px;
+  margin-bottom: 20px;
+  border: 1px solid #e3e9f4;
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+  color: #7585a8;
+}
+.hero h1 {
+  font-size: clamp(24px, 3vw, 38px);
+  margin: 7px 0;
+  color: #142653;
+  font-weight: 800;
+}
+.hero h1 span { color: #4162ef; }
+.muted { color: #8190ac; font-size: 13px; }
+
+.primary {
+  background: linear-gradient(100deg, #326df8, #7847f7);
+  color: white;
+  border: 0;
+  border-radius: 11px;
+  padding: 13px 19px;
+  box-shadow: 0 8px 18px #536bdf28;
+  font-weight: 700;
+  transition: opacity 0.2s;
+}
+.primary:hover { opacity: 0.9; }
+
+/* CARDS & STATS */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.stat, .panel {
+  background: white;
+  border: 1px solid #e7ebf6;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px #253d7610;
+}
+.stat {
+  padding: 20px;
+  min-height: 145px;
+  position: relative;
+  overflow: hidden;
+}
+.stat .ico { font-size: 24px; }
+.stat h2 { font-size: 32px; margin: 10px 0 4px; color: #101e46; font-weight: 800; }
+.stat b { font-size: 13px; }
+.stat .detail { font-size: 12px; color: #8190ac; margin-top: 8px; }
+.stat:nth-child(1) { background: linear-gradient(145deg, #fff, #f0f7ff); }
+.stat:nth-child(2) { background: linear-gradient(145deg, #fff, #effdf8); }
+.stat:nth-child(3) { background: linear-gradient(145deg, #fff, #fff5ed); }
+.stat:nth-child(4) { background: linear-gradient(145deg, #fff, #f6f1ff); }
+
+/* PAGES NAVIGATION */
+.page { display: none; }
+.page.active { display: block; }
+
+.panel { padding: 20px; margin-bottom: 17px; }
+.panel h3 { margin: 0; font-size: 16px; font-weight: 700; }
+.panelhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.controls input, .controls select, .form input, .form select {
+  border: 1px solid #e3e9f4;
+  border-radius: 10px;
+  padding: 11px 13px;
+  background: #f9fbff;
+  color: #253758;
+  min-width: 120px;
+}
+.controls input { width: 230px; }
+
+/* TABLE */
+.tablewrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+  min-width: 850px;
+}
+th {
+  background: #f4f7ff;
+  color: #7484a1;
+  font-size: 11px;
+  letter-spacing: .3px;
+  padding: 12px;
+}
+td { padding: 15px 12px; border-bottom: 1px solid #edf0f7; }
+tr:last-child td { border: 0; }
+td strong { display: block; color: #101e46; }
+td small { display: block; color: #8996ae; margin-top: 4px; }
+
+/* PILLS & PROGRESS */
+.pill {
+  display: inline-block;
+  border-radius: 50px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.pill.Completed, .pill.On-Track, .pill.On-track, .pill.done { color: #009d76; background: #e2faf0; }
+.pill.At-Risk, .pill.At-risk, .pill.risk { color: #e56c27; background: #fff0e5; }
+
+.progress {
+  height: 8px;
+  background: #e9edf7;
+  border-radius: 12px;
+  width: 120px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+}
+.progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #315ff0, #598bff);
+  border-radius: 12px;
+}
+
+.action {
+  border: 0;
+  background: #edf2ff;
+  color: #4168e6;
+  border-radius: 9px;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+.action:hover { background: #326df8; color: white; }
+
+/* BOTTOM GRID */
+.bottom {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1fr;
+  gap: 16px;
+}
+.riskbody { display: flex; align-items: center; gap: 28px; margin: 22px 0; }
+.donut {
+  width: 148px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: conic-gradient(#f34e64 0 20%, #3775ff 20% 100%);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.donut div {
+  background: white;
+  width: 105px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+.donut b { font-size: 30px; color: #101e46; }
+.legend p { font-size: 12px; color: #6d7a95; margin: 6px 0; cursor: pointer; }
+.legend b { color: #1e2c53; }
+
+.item { padding: 12px 0; border-bottom: 1px solid #eef1f7; font-size: 13px; }
+.item:last-child { border: 0; }
+.item strong { display: block; color: #101e46; }
+.item small { color: #8b98b0; display: block; margin-top: 3px; }
+.date {
+  display: inline-block;
+  background: #edf3ff;
+  border-radius: 9px;
+  padding: 8px;
+  margin-right: 10px;
+  color: #355ed5;
+  font-weight: 800;
+  font-size: 11px;
+}
+.flex { display: flex; align-items: center; }
+.empty { padding: 20px; text-align: center; color: #8590a6; }
+
+/* DOCUMENT ROWS */
+.doc-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid #edf0f7;
+}
+.doc-row strong { font-size: 13px; color: #101e46; }
+.doc-row small { color: #8190ac; display: block; margin-top: 4px; }
+
+/* AI ASSISTANT FULL PAGE */
+.assistant-workspace { padding: 0; overflow: hidden; }
+.assistant-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e7ebf6;
   background: #fdfefe;
 }
-.item:last-child {border-bottom:0}
-.item strong {font-size:11px}
-.item small {
-  display:block;
-  margin-top:4px;
-  color:var(--muted);
-  line-height:1.5;
-}
-.sample-note {
-  color:#98a5b7;
-  font-size:11px;
-  line-height:1.7;
-  margin-top: 15px;
-}
-  
-.quick-card {
-  padding:22px;
-}
-.quick-card p {
-  color:#7587a1;
-  line-height:1.7;
-  font-size:12px;
-}
-.quick-card .primary {width:100%;margin-top:12px}
-
-/* FULL AI WORKSPACE */
-.assistant-workspace {
-  padding:0;
-  overflow:hidden;
-}
-.assistant-header {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:18px 20px;
-  border-bottom:1px solid var(--border);
-}
-.assistant-header .logo {width:40px;height:40px}
-.assistant-header strong {font-size:14px}
-.assistant-header small {
-  display:block;
-  color:var(--muted);
-  margin-top:5px;
-}
 .full-chat {
-  height:calc(100dvh - 245px);
-  min-height:600px;
-  width:100%;
+  height: calc(100vh - 220px);
+  min-height: 550px;
+  width: 100%;
 }
-.full-chat iframe,
-.popup-body iframe {
-  display:block;
-  width:100%;
-  height:100%;
-  border:0;
-  background:white;
+.full-chat iframe, .popup-body iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: white;
 }
 
-/* OTHER PAGES */
-.doc-row {
-  display:flex;
-  align-items:flex-start;
-  gap:13px;
-  padding:18px 0;
-  border-bottom:1px solid var(--border);
-}
-.doc-row i {
-  font-size:21px;
-  color:var(--blue);
-}
-.doc-row strong {font-size:12px}
-.doc-row small {
-  display:block;
-  color:var(--muted);
-  margin-top:5px;
-  line-height:1.6;
-}
-
-/* FLOATING CHAT */
+/* FLOATING CHAT POPUP */
 .float-btn {
-  position:fixed;
-  right:23px;
-  bottom:22px;
-  z-index:101;
-  width:59px;
-  height:59px;
-  border:0;
-  border-radius:18px;
-  background:linear-gradient(135deg,#4486ff,#915aff);
-  color:white;
-  font-size:25px;
-  box-shadow:0 9px 25px #5b7dff55;
+  position: fixed;
+  right: 23px;
+  bottom: 22px;
+  z-index: 101;
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #326df8, #7847f7);
+  color: white;
+  font-size: 24px;
+  box-shadow: 0 9px 25px rgba(50, 109, 248, 0.35);
+  display: grid;
+  place-items: center;
 }
 .popup {
-  display:none;
-  position:fixed;
-  right:18px;
-  top:12px;
-  width:560px;
-  max-width:calc(100vw - 24px);
-  height:calc(100dvh - 95px);
-  z-index:100;
-  background:white;
-  border:1px solid var(--border);
-  border-radius:18px;
-  overflow:hidden;
-  box-shadow:0 20px 70px #233d6855;
-  flex-direction:column;
+  display: none;
+  position: fixed;
+  right: 18px;
+  top: 15px;
+  width: 540px;
+  max-width: calc(100vw - 24px);
+  height: calc(100vh - 85px);
+  z-index: 100;
+  background: white;
+  border: 1px solid #e7ebf6;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(16, 33, 77, 0.2);
+  flex-direction: column;
 }
-.popup.open {display:flex}
-.popup.expanded {width:min(950px,calc(100vw - 36px))}
+.popup.open { display: flex; }
+.popup.expanded { width: min(920px, calc(100vw - 36px)); }
 .popup-header {
-  display:flex;
-  align-items:center;
-  gap:11px;
-  padding:15px;
-  border-bottom:1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e7ebf6;
+  background: #fbfcfe;
 }
-.popup-header .logo {width:37px;height:37px}
-.popup-header strong {font-size:13px}
-.popup-header small {
-  display:block;
-  color:var(--muted);
-  margin-top:4px;
-}
-.popup-controls {
-  margin-left:auto;
-  display:flex;
-  gap:7px;
-}
+.popup-controls { margin-left: auto; display: flex; gap: 6px; }
 .popup-controls button {
-  border:1px solid var(--border);
-  background:white;
-  border-radius:9px;
-  width:34px;
-  height:34px;
-  color:#536782;
+  border: 1px solid #e3e9f4;
+  background: white;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  color: #536782;
 }
-.popup-body {flex:1;min-height:0}
+.popup-body { flex: 1; min-height: 0; }
 
-/* RESPONSIVE */
-@media(max-width:950px) {
-  .stats {grid-template-columns:repeat(2,minmax(0,1fr))}
-  .lower-grid {grid-template-columns:1fr 1fr}
+/* RISK MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 32, 72, 0.45);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 200;
 }
-@media(max-width:650px) {
-  .sidebar {width:65px}
-  .sidebar .brand-text,
-  .sidebar .nav-label,
-  .sidebar .side-note {display:none}
-  .sidebar .nav-btn {justify-content:center;padding:0}
-  .main {padding:20px 13px 70px}
-  .topbar {margin-bottom:22px}
-  .welcome {flex-direction:column;align-items:flex-start}
-  .stats {gap:10px}
-  .stat {padding:14px}
-  .stat strong {font-size:24px}
-  .lower-grid {grid-template-columns:1fr}
-  .card {padding:16px}
-  .assistant-workspace {padding:0}
-  .full-chat {min-height:550px}
-  .popup,.popup.expanded {
-    right:8px;
-    top:8px;
-    width:calc(100vw - 16px);
-    max-width:none;
-    height:calc(100dvh - 85px);
-  }
-  .float-btn {right:13px;bottom:13px}
+.modal.open { display: flex; }
+.dialog {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  width: min(500px, 100%);
+  box-shadow: 0 20px 60px rgba(16, 33, 77, 0.25);
+}
+.dialog h2 { margin-top: 0; color: #101e46; font-size: 18px; }
+
+.footer { font-size: 11px; color: #8d99b0; margin-top: 20px; }
+
+@media(max-width: 1100px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .bottom { grid-template-columns: 1fr 1fr; }
+  .bottom .panel:last-child { grid-column: span 2; }
+}
+@media(max-width: 650px) {
+  .sidebar { width: 58px; }
+  .main { padding: 15px; }
+  .hero { padding: 20px; flex-direction: column; align-items: flex-start; }
+  .stats, .bottom { grid-template-columns: 1fr; }
+  .bottom .panel:last-child { grid-column: auto; }
+  .popup, .popup.expanded { right: 8px; top: 8px; width: calc(100vw - 16px); height: calc(100vh - 80px); }
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<div class="shell">
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar">
+    <div class="logo">◎</div>
+    <button class="nav active" title="Dashboard" onclick="setPage('overview')">⌂</button>
+    <button class="nav" title="Projects" onclick="setPage('projects')">▱</button>
+    <button class="nav" title="Risks" onclick="setPage('risks')">⚠</button>
+    <button class="nav" title="Reports" onclick="setPage('reports')">▥</button>
+    <button class="nav" title="Documents" onclick="setPage('documents')">📄</button>
+    <button class="nav" title="AI Assistant" onclick="setPage('assistant')">✦</button>
+  </aside>
 
-<!-- SIDEBAR -->
-<aside class="sidebar collapsed" id="sidebar">
-  <div class="brand">
-    <img src="IMG_5286.PNG" alt="Logo" style="width: 40px; height: 40px; border-radius: 13px; object-fit: cover;">
-    <div class="brand-text">
-      <strong>ProjectPilot AI</strong>
-      <small>Project Command Center</small>
-    </div>
-  </div>
-
-  <nav class="navigation">
-    <button class="nav-btn active" data-page="overview" title="Overview">
-      <i class="icon icon-house"></i>
-      <span class="nav-label">Overview</span>
-    </button>
-    <button class="nav-btn" data-page="projects" title="Projects">
-      <i class="icon icon-folder"></i>
-      <span class="nav-label">Projects</span>
-    </button>
-    <button class="nav-btn" data-page="risks" title="Risks & Issues">
-      <i class="icon icon-triangle-alert"></i>
-      <span class="nav-label">Risks & Issues</span>
-    </button>
-    <button class="nav-btn" data-page="reports" title="Reports">
-      <i class="icon icon-chart-column"></i>
-      <span class="nav-label">Reports</span>
-    </button>
-    <button class="nav-btn" data-page="documents" title="Documents">
-      <i class="icon icon-file-text"></i>
-      <span class="nav-label">Documents</span>
-    </button>
-    <button class="nav-btn" data-page="assistant" title="AI Assistant">
-      <i class="icon icon-sparkles"></i>
-      <span class="nav-label">AI Assistant</span>
-    </button>
-  </nav>
-
-  <div class="side-footer">
-    <div class="side-note">
-      <strong>✦ Smarter projects with AI</strong>
-      <small>Plan, track and deliver with confidence.</small>
-    </div>
-    <button class="collapse-btn" id="sidebar-toggle" title="Expand or collapse sidebar">
-      <i class="icon icon-panel-left"></i>
-    </button>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<main class="main">
-
-  <div class="topbar">
-    <div class="top-search">
-      <i class="icon icon-search"></i>
-      <input id="global-search" placeholder="Search projects...">
-    </div>
-    <div class="profile">PP</div>
-  </div>
-
-  <div class="welcome">
-    <div>
-      <div class="eyebrow">Project delivery workspace</div>
-      <h1 id="page-heading">Your project portfolio at a glance</h1>
-      <p class="subtitle" id="page-subtitle">
-        Track progress, identify risks and take action with your AI assistant.
-      </p>
-    </div>
-    <button class="primary" id="new-project">
-      <i class="icon icon-plus"></i> New Project
-    </button>
-  </div>
-
-  <!-- OVERVIEW -->
-  <section class="page active" id="page-overview">
-
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-icon blue"><i class="icon icon-folder"></i></div>
-        <strong id="stat-total">0</strong>
-        <small>Total projects</small>
-      </div>
-      <div class="stat">
-        <div class="stat-icon green"><i class="icon icon-circle-check"></i></div>
-        <strong id="stat-ontrack">0</strong>
-        <small>On track</small>
-      </div>
-      <div class="stat">
-        <div class="stat-icon orange"><i class="icon icon-triangle-alert"></i></div>
-        <strong id="stat-atrisk">0</strong>
-        <small>At risk</small>
-      </div>
-      <div class="stat">
-        <div class="stat-icon purple"><i class="icon icon-calendar-days"></i></div>
-        <strong id="stat-upcoming">0</strong>
-        <small>Upcoming deadlines</small>
-      </div>
-    </div>
-
-    <div class="dashboard-grid">
-
-      <!-- MAIN FULL WIDTH CONTENT -->
+  <!-- MAIN SECTION -->
+  <main class="main">
+    <header class="hero">
       <div>
+        <div class="eyebrow">PROJECT DELIVERY WORKSPACE</div>
+        <h1 id="page-heading">Your project portfolio <span>at a glance</span></h1>
+        <div class="muted" id="page-subtitle">Track progress, identify risks and take action with your AI assistant.</div>
+      </div>
+      <button class="primary" id="btn-new-project">＋ New Project</button>
+    </header>
 
-        <div class="card">
-          <div class="card-head">
-            <h2>Project portfolio</h2>
-            <button class="link-btn" data-goto="projects">View all →</button>
-          </div>
+    <!-- OVERVIEW PAGE -->
+    <section class="page active" id="page-overview">
+      <section class="stats">
+        <div class="stat">
+          <span class="ico">📁</span>
+          <div class="detail">Total Projects</div>
+          <h2 id="stat-total">0</h2>
+          <b>Portfolio overview</b>
+        </div>
+        <div class="stat">
+          <span class="ico">✅</span>
+          <div class="detail">On Track / Completed</div>
+          <h2 id="stat-ontrack">0</h2>
+          <b id="trackPct">0% of total</b>
+        </div>
+        <div class="stat">
+          <span class="ico">⚠️</span>
+          <div class="detail">At Risk</div>
+          <h2 id="stat-atrisk">0</h2>
+          <b id="riskPct">0% of total</b>
+        </div>
+        <div class="stat">
+          <span class="ico">🗓️</span>
+          <div class="detail">Upcoming Deadlines (14 days)</div>
+          <h2 id="stat-upcoming">0</h2>
+          <b>Due soon</b>
+        </div>
+      </section>
 
-          <input class="search" id="dash-search" placeholder="Search projects...">
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Project</th>
-                  <th>Status</th>
-                  <th>Current update</th>
-                  <th>Progress</th>
-                  <th>Target date</th>
-                </tr>
-              </thead>
-              <tbody id="dash-projects"></tbody>
-            </table>
+      <section class="panel" id="portfolio">
+        <div class="panelhead">
+          <h3>📚 Project portfolio</h3>
+          <div class="controls">
+            <input id="dash-search" placeholder="⌕ Search projects...">
+            <select id="statusFilter" onchange="applyDashFilters()">
+              <option value="">All Status</option>
+              <option>On track</option>
+              <option>At risk</option>
+              <option>Completed</option>
+            </select>
+            <select id="divisionFilter" onchange="applyDashFilters()">
+              <option value="">All Divisions</option>
+            </select>
           </div>
         </div>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>PROJECT</th>
+                <th>DIVISION</th>
+                <th>STATUS</th>
+                <th>CURRENT UPDATE</th>
+                <th>PROGRESS</th>
+                <th>TARGET DATE</th>
+              </tr>
+            </thead>
+            <tbody id="dash-projects"></tbody>
+          </table>
+        </div>
+      </section>
 
-        <div class="lower-grid">
-
-          <div class="card">
-            <div class="card-head"><h2>Risk & issue overview</h2></div>
-            <div class="donut">
-              <div class="donut-inner">
-                <div><strong id="risk-total">5</strong><br><small>Total</small></div>
-              </div>
+      <section class="bottom">
+        <div class="panel" id="risks">
+          <h3>🛡️ Risk & issue overview</h3>
+          <div class="riskbody">
+            <div class="donut" id="donut">
+              <div><b id="risk-total">0</b><small>Total projects</small></div>
             </div>
             <div class="legend">
-              <div onclick="showRiskProjects('high')" style="cursor:pointer; padding:2px 0; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
-                🔴 <span id="risk-high">2</span> High impact
-              </div>
-              <div onclick="showRiskProjects('medium')" style="cursor:pointer; padding:2px 0; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
-                🟠 <span id="risk-medium">1</span> Medium impact
-              </div>
-              <div onclick="showRiskProjects('low')" style="cursor:pointer; padding:2px 0; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
-                🔵 <span id="risk-low">2</span> Low impact
-              </div>
+              <p onclick="showRiskProjects('high')">🔴 <b id="risk-high">0</b> High impact</p>
+              <p onclick="showRiskProjects('medium')">🟠 <b id="risk-medium">0</b> Medium impact</p>
+              <p onclick="showRiskProjects('low')">🔵 <b id="risk-low">0</b> Low impact</p>
             </div>
           </div>
+        </div>
 
-          <!-- DYNAMIC UPCOMING MILESTONES -->
-          <div class="card">
-            <div class="card-head"><h2>Upcoming milestones</h2></div>
-            <div id="upcoming-milestones-container">
-              <div class="item"><small style="color:#8492a9;">Loading milestones...</small></div>
-            </div>
+        <div class="panel" id="milestones">
+          <h3>🚩 Upcoming milestones</h3>
+          <div id="upcoming-milestones-container"></div>
+        </div>
+
+        <div class="panel" id="activity">
+          <h3>⚡ Recent activity</h3>
+          <div id="recent-activity-container"></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- PROJECTS PAGE -->
+    <section class="page" id="page-projects">
+      <section class="panel">
+        <div class="panelhead">
+          <h3>📂 All Active Initiatives</h3>
+          <div class="controls">
+            <input id="all-search" placeholder="⌕ Search all projects...">
           </div>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>PROJECT</th>
+                <th>DIVISION</th>
+                <th>STATUS</th>
+                <th>CURRENT UPDATE</th>
+                <th>PROGRESS</th>
+                <th>TARGET DATE</th>
+              </tr>
+            </thead>
+            <tbody id="all-projects"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
 
-          <!-- DYNAMIC RECENT ACTIVITY -->
-          <div class="card">
-            <div class="card-head"><h2>Recent activity</h2></div>
-            <div id="recent-activity-container">
-              <div class="item"><small style="color:#8492a9;">Loading recent activities...</small></div>
-            </div>
+    <!-- RISKS PAGE -->
+    <section class="page" id="page-risks">
+      <section class="panel">
+        <h3>🛡️ Risk & Issue Register</h3>
+        <p class="muted" style="margin-top:5px;">Monitor active risks and automated escalation triggers.</p>
+        <div class="doc-row">
+          <span>⚠️</span>
+          <div>
+            <strong>Automated Escalation via Power Automate</strong>
+            <small>At-risk projects automatically alert stakeholders on Teams & Outlook.</small>
           </div>
-
         </div>
-
-        <p class="sample-note">
-          Dashboard figures and project information are illustrative and not yet connected to Dataverse.
-        </p>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- PROJECTS -->
-  <section class="page" id="page-projects">
-    <div class="card">
-      <div class="card-head">
-        <h2>Project portfolio</h2>
-        <span class="sample-note">Sample data</span>
-      </div>
-
-      <input class="search" id="all-search" placeholder="Search projects...">
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Project</th>
-              <th>Status</th>
-              <th>Progress</th>
-              <th>Owner</th>
-              <th>Target date</th>
-            </tr>
-          </thead>
-          <tbody id="all-projects"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- RISKS -->
-  <section class="page" id="page-risks">
-    <div class="card">
-      <h2>Risk & issue management</h2>
-      <p class="subtitle" style="margin:15px 0">
-        Identify, assess and monitor project risks, issues and changes.
-      </p>
-
-      <div class="doc-row">
-        <i class="icon icon-triangle-alert"></i>
-        <div>
-          <strong>Risk register</strong>
-          <small>Risk identification, impact and mitigation tracking — planned.</small>
+        <div class="doc-row">
+          <span>📊</span>
+          <div>
+            <strong>Risk Classification</strong>
+            <small>High, Medium, and Low risk categorizations computed from completion target dates.</small>
+          </div>
         </div>
-      </div>
+        <button class="primary" style="margin-top:15px;" onclick="openChat()">Ask PANTAS AI Risk Support</button>
+      </section>
+    </section>
 
-      <div class="doc-row">
-        <i class="icon icon-circle-alert"></i>
-        <div>
-          <strong>Issue tracker</strong>
-          <small>Open issues and resolution tracking — planned.</small>
+    <!-- REPORTS PAGE -->
+    <section class="page" id="page-reports">
+      <section class="panel">
+        <h3>📈 Performance & Analytics</h3>
+        <p class="muted" style="margin-top:5px;">Portfolio health trends and milestone tracking.</p>
+        <div class="doc-row">
+          <span>📑</span>
+          <div>
+            <strong>Project Status Reports</strong>
+            <small>Dataverse live summaries integrated into PANTAS AI.</small>
+          </div>
         </div>
-      </div>
+      </section>
+    </section>
 
-      <div class="doc-row">
-        <i class="icon icon-refresh-cw"></i>
-        <div>
-          <strong>Change control</strong>
-          <small>Scope changes and impact management — planned.</small>
+    <!-- DOCUMENTS PAGE -->
+    <section class="page" id="page-documents">
+      <section class="panel">
+        <h3>📄 Document Workspace</h3>
+        <div class="doc-row">
+          <span>📝</span>
+          <div>
+            <strong>ProjectPilot Architecture Blueprint.pdf</strong>
+            <small>System schema, Power Automate webhooks, and JSONBin structure.</small>
+          </div>
         </div>
-      </div>
-
-      <button class="primary" data-chat style="margin-top:20px">
-        <i class="icon icon-sparkles"></i> Ask PANTAS
-      </button>
-    </div>
-  </section>
-
-  <!-- REPORTS -->
-  <section class="page" id="page-reports">
-    <div class="card">
-      <h2>Reports & insights</h2>
-
-      <div class="doc-row">
-        <i class="icon icon-chart-column"></i>
-        <div>
-          <strong>Project status reports</strong>
-          <small>Progress, milestone and delivery summaries.</small>
+        <div class="doc-row">
+          <span>📋</span>
+          <div>
+            <strong>Agent-thon Phase 2 Roadmap.docx</strong>
+            <small>Specifications for automated risk solutioning and enterprise scaling.</small>
+          </div>
         </div>
-      </div>
+      </section>
+    </section>
 
-      <div class="doc-row">
-        <i class="icon icon-file-text"></i>
-        <div>
-          <strong>Stakeholder reporting</strong>
-          <small>Project updates and governance reports.</small>
+    <!-- FULL AI ASSISTANT PAGE -->
+    <section class="page" id="page-assistant">
+      <section class="panel assistant-workspace">
+        <div class="assistant-header">
+          <div class="logo" style="width:36px; height:36px; font-size:14px;">✦</div>
+          <div>
+            <strong style="display:block;">PANTAS AI Assistant</strong>
+            <small class="muted">Live Copilot Studio Chatbot</small>
+          </div>
         </div>
-      </div>
+        <div class="full-chat" id="full-chat"></div>
+      </section>
+    </section>
 
-      <button class="primary" data-chat style="margin-top:20px">
-        <i class="icon icon-sparkles"></i> Generate insights with PANTAS
-      </button>
-    </div>
-  </section>
-
-  <!-- DOCUMENTS -->
-  <section class="page" id="page-documents">
-    <div class="card">
-      <h2>Document workspace</h2>
-
-      <div class="doc-row">
-        <i class="icon icon-file-text"></i>
-        <div>
-          <strong>Request for Quotation</strong>
-          <small>Prepare procurement requirements and RFQ documents.</small>
-        </div>
-      </div>
-
-      <div class="doc-row">
-        <i class="icon icon-files"></i>
-        <div>
-          <strong>Business cases and approvals</strong>
-          <small>Prepare supporting project documentation.</small>
-        </div>
-      </div>
-
-      <div class="doc-row">
-        <i class="icon icon-folder"></i>
-        <div>
-          <strong>Project document library</strong>
-          <small>SharePoint document retrieval.</small>
-        </div>
-      </div>
-
-      <button class="primary" data-chat style="margin-top:20px">
-        <i class="icon icon-sparkles"></i> Open document assistant
-      </button>
-    </div>
-  </section>
-
-  <!-- DEDICATED AI ASSISTANT -->
-  <section class="page" id="page-assistant">
-    <div class="card assistant-workspace">
-      <div class="assistant-header">
-        <img src="IMG_5286.PNG" alt="Logo" style="width: 42px; height: 42px; border-radius: 13px; object-fit: cover; flex: none;">
-        <div>
-          <strong>PANTAS Project Assistant</strong>
-          <small>Live Copilot Studio · ProjectPilot AI</small>
-        </div>
-      </div>
-
-      <div class="full-chat" id="full-chat"></div>
-    </div>
-  </section>
-
-</main>
+    <div class="footer">Dashboard connected dynamically to JSONBin & Dataverse via ProjectPilot AI API.</div>
+  </main>
 </div>
 
-<!-- FLOATING CHAT -->
-<button class="float-btn" id="float-btn" aria-label="Open AI chat" style="display: grid; place-items: center; padding: 0;">
-  <img src="IMG_5286.PNG" alt="AI Chat" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-</button>
+<!-- FLOATING CHAT POPUP -->
+<button class="float-btn" id="float-btn" title="Open AI Chat">✦</button>
 
 <div class="popup" id="popup">
   <div class="popup-header">
-    <img src="IMG_5286.PNG" alt="Logo" style="width: 37px; height: 37px; border-radius: 9px; object-fit: cover; flex: none;">
+    <div class="logo" style="width:32px; height:32px; font-size:12px;">✦</div>
     <div>
-      <strong>PANTAS Assistant</strong>
-      <small>Copilot Studio · ProjectPilot AI</small>
+      <strong style="display:block; font-size:13px;">PANTAS Assistant</strong>
+      <small class="muted" style="font-size:10px;">Copilot Studio · ProjectPilot AI</small>
     </div>
-
     <div class="popup-controls">
-      <button id="expand-chat" title="Expand chat">⛶</button>
-      <button id="close-chat" title="Close chat">✕</button>
+      <button id="expand-chat" title="Expand">⛶</button>
+      <button id="close-chat" title="Close">✕</button>
     </div>
   </div>
-
   <div class="popup-body" id="popup-chat"></div>
 </div>
 
-<!-- MODAL POPUP UNTUK RISK & PROJECT DETAILS -->
-<div id="risk-modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
-  <div style="background:white; border-radius:16px; width:90%; max-width:500px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.2); position:relative;">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e9eef6; padding-bottom:12px; margin-bottom:15px;">
-      <h3 id="modal-title" style="margin:0; font-family:'Plus Jakarta Sans'; font-size:16px; color:#15213a;">Project Risk Details</h3>
-      <button onclick="closeRiskModal()" style="border:none; background:transparent; font-size:18px; cursor:pointer; color:#8492a9;">✕</button>
+<!-- RISK MODAL POPUP -->
+<div class="modal" id="risk-modal">
+  <div class="dialog">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #edf0f7; padding-bottom:12px; margin-bottom:15px;">
+      <h2 id="modal-title" style="margin:0;">Risk Details</h2>
+      <button onclick="closeRiskModal()" style="border:0; background:transparent; font-size:18px; cursor:pointer;">✕</button>
     </div>
-    <div id="modal-project-list" style="max-height:300px; overflow-y:auto;">
-      <!-- Senarai projek dimasukkan melalui Javascript -->
-    </div>
+    <div id="modal-project-list" style="max-height:320px; overflow-y:auto;"></div>
   </div>
 </div>
 
 <script>
-function getStatusBadge(statusText) {
-    if (!statusText) return '<span class="status track">On track</span>';
-    const s = statusText.trim().toLowerCase();
-    
-    if (s.includes('complet')) {
-        return `<span class="status done">${statusText}</span>`;
-    } else if (s.includes('risk')) {
-        return `<span class="status risk">${statusText}</span>`;
-    } else if (s.includes('delay')) {
-        return `<span class="status" style="background:#fde8e8;color:#e85b65;">${statusText}</span>`;
-    } else {
-        return `<span class="status track">${statusText}</span>`;
-    }
-}
-  
-/* WORKING PANTAS CONNECTION */
-const envId="37954b56-6662-eab5-8c43-065ce3edaff5";
-const botName="cr4a6_Group10";
-
+/* 1. COPILOT STUDIO PANTAS CONNECTION */
+const envId = "37954b56-6662-eab5-8c43-065ce3edaff5";
+const botName = "cr4a6_Group10";
 const baseEmbedUrl = `https://copilotstudio.microsoft.com/environments/${envId}/bots/${botName}/webchat?__profile__=pva`;
 
-const $=id=>document.getElementById(id);
+const $ = id => document.getElementById(id);
 
+/* 2. DEFAULT SEED DATA */
 let projects = [
-  {name:"Cafe at Main Branch",dept:"Facilities",status:"On track",progress:75,owner:"SH",date:"25 Dec 2026",currentUpdate:"Site review completed",currentStep:"Complete facility design review",nextTargetDate:"25 Dec 2026"},
-  {name:"Office Renovation",dept:"Administration",status:"On track",progress:60,owner:"AK",date:"30 Nov 2026",currentUpdate:"Draft RFQ prepared",currentStep:"Submit approval papers",nextTargetDate:"30 Nov 2026"},
-  {name:"Walkie-Talkie Procurement",dept:"Safety",status:"At risk",progress:40,owner:"ZR",date:"15 Dec 2026",currentUpdate:"Pending vendor response",currentStep:"Finalise RFQ",nextTargetDate:"15 Dec 2026"},
-  {name:"Document Digitisation",dept:"Operations",status:"Completed",progress:100,owner:"LT",date:"30 Sep 2026",currentUpdate:"Project completed",currentStep:"Project Sign-off",nextTargetDate:"30 Sep 2026"}
+  {name:"Cafe at Main Branch", dept:"Facilities", status:"Completed", update:"Project completed.", progress:100, date:"2026-10-25", currentStep:"Final Handover", nextTargetDate:"2026-10-25"},
+  {name:"Signage repair", dept:"Administration", status:"At risk", update:"3rd milestone completed", progress:15, date:"2026-10-28", currentStep:"Sign-off approval", nextTargetDate:"2026-10-28"},
+  {name:"Branch Renovation", dept:"FAS", status:"On track", update:"BCA submitted, pending PA", progress:20, date:"2027-01-19", currentStep:"Pending PA Approval", nextTargetDate:"2027-01-19"},
+  {name:"Rooftop setup", dept:"FAS", status:"On track", update:"Preparing Business Case Approval", progress:20, date:"2026-12-20", currentStep:"BCA Draft", nextTargetDate:"2026-12-20"},
+  {name:"AI-Powered Project Insight", dept:"Technology", status:"On track", update:"Drafting system infrastructure completed.", progress:20, date:"2026-12-21", currentStep:"Infrastructure setup", nextTargetDate:"2026-12-21"}
 ];
 
-function updateDashboardStats(projectsData) {
-  if (!projectsData || !Array.isArray(projectsData)) return;
-
-  const today = new Date();
-  const total = projectsData.length;
-
-  let onTrack = 0;
-  let atRisk = 0;
-
-  projectsData.forEach(p => {
-    const s = (p.status || "").trim().toLowerCase();
-    const progress = Number(p.progress) || 0;
-    
-    let diffDays = 999;
-    if (p.date && p.date !== "-") {
-      const targetDate = new Date(p.date);
-      if (!isNaN(targetDate.getTime())) {
-        diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
-      }
-    }
-
-    if (s.includes('risk') || (diffDays >= 0 && diffDays <= 7 && progress < 50)) {
-      atRisk++;
-    } else if (s.includes('track') || s.includes('on track') || progress >= 50) {
-      onTrack++;
-    } else {
-      onTrack++;
-    }
-  });
-
-  const upcoming = projectsData.filter(p => {
-    const targetStr = p.nextTargetDate || p.date;
-    if (!targetStr || targetStr === "-") return false;
-    const targetDate = new Date(targetStr);
-    if (isNaN(targetDate.getTime())) return false;
-    const diffTime = targetDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays >= 0 && diffDays <= 14;
-  }).length;
-
-  if ($("stat-total")) $("stat-total").textContent = total;
-  if ($("stat-ontrack")) $("stat-ontrack").textContent = onTrack;
-  if ($("stat-atrisk")) $("stat-atrisk").textContent = atRisk;
-  if ($("stat-upcoming")) $("stat-upcoming").textContent = upcoming;
+/* 3. HELPER FUNCTIONS */
+function getStatusBadge(statusText) {
+  if (!statusText) return '<span class="pill On-track">On track</span>';
+  const s = statusText.trim().toLowerCase();
+  if (s.includes('complet')) return `<span class="pill Completed">${statusText}</span>`;
+  if (s.includes('risk')) return `<span class="pill At-Risk">${statusText}</span>`;
+  return `<span class="pill On-track">${statusText}</span>`;
 }
 
-function updateRiskOverviewStats(projectsData) {
-  if (!projectsData || !Array.isArray(projectsData)) return;
-
-  const today = new Date();
-  let highCount = 0;
-  let mediumCount = 0;
-  let lowCount = 0;
-
-  projectsData.forEach(p => {
-    const status = (p.status || "").toLowerCase();
-    const progress = Number(p.progress) || 0;
-    
-    let diffDays = 999;
-    if (p.date && p.date !== "-") {
-      const targetDate = new Date(p.date);
-      if (!isNaN(targetDate.getTime())) {
-        diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
-      }
-    }
-
-    if (status.includes('risk') || (diffDays >= 0 && diffDays <= 7 && progress < 50)) {
-      highCount++;
-    } else if ((diffDays > 7 && diffDays <= 14) || status.includes('delay') || (progress >= 50 && progress < 70)) {
-      mediumCount++;
-    } else {
-      lowCount++;
-    }
-  });
-
-  const totalRisks = projectsData.length;
-
-  if ($("risk-total")) $("risk-total").textContent = totalRisks;
-  if ($("risk-high")) $("risk-high").textContent = highCount;
-  if ($("risk-medium")) $("risk-medium").textContent = mediumCount;
-  if ($("risk-low")) $("risk-low").textContent = lowCount;
-
-  const donutEl = document.querySelector('.donut');
-  if (donutEl) {
-    if (totalRisks === 0) {
-      donutEl.style.background = "#edf1f8";
-    } else {
-      const highDeg = (highCount / totalRisks) * 360;
-      const mediumDeg = highDeg + (mediumCount / totalRisks) * 360;
-      const lowDeg = mediumDeg + (lowCount / totalRisks) * 360;
-
-      donutEl.style.background = `conic-gradient(
-        #f45a63 0deg ${highDeg}deg,
-        #ffad45 ${highDeg}deg ${mediumDeg}deg,
-        #4280ff ${mediumDeg}deg ${lowDeg}deg
-      )`;
-    }
-  }
+function formatDate(dateStr) {
+  if (!dateStr || dateStr === "-") return "-";
+  try {
+    const d = new Date(dateStr.includes("T") ? dateStr : dateStr + "T12:00:00");
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch(e) { return dateStr; }
 }
 
-/* FUNGSI PAPARAN DINAMIK UPCOMING MILESTONES */
-function renderUpcomingMilestones(projectsData) {
-  const container = $("upcoming-milestones-container");
-  if (!container) return;
-
-  const today = new Date();
-
-  let milestones = projectsData.map(p => {
-    const targetStr = p.nextTargetDate || p.date;
-    let diffDays = 999;
-    let formattedDate = targetStr;
-
-    if (targetStr && targetStr !== "-") {
-      const d = new Date(targetStr);
-      if (!isNaN(d.getTime())) {
-        diffDays = Math.ceil((d - today) / (1000 * 60 * 60 * 24));
-        formattedDate = d.toLocaleDateString("en-GB", { day: 'numeric', month: 'short' });
-      }
-    }
-
-    return {
-      projectName: p.name,
-      step: p.currentStep || "Next milestone review",
-      dateStr: formattedDate,
-      diffDays: diffDays,
-      rawProject: p
-    };
-  });
-
-  milestones.sort((a, b) => a.diffDays - b.diffDays);
-  const displayMilestones = milestones.slice(0, 3);
-
-  if (displayMilestones.length === 0) {
-    container.innerHTML = '<div class="item"><small style="color:#8492a9;">No upcoming milestones.</small></div>';
-    return;
-  }
-
-  container.innerHTML = displayMilestones.map(m => {
-    let badgeHtml = "";
-    if (m.diffDays < 0) {
-      badgeHtml = `<span style="background:#fde8e8; color:#e85b65; padding:2px 6px; border-radius:10px; font-size:9px; font-weight:700; margin-left:6px;">Overdue</span>`;
-    } else if (m.diffDays === 0) {
-      badgeHtml = `<span style="background:#fff1e5; color:#ce822b; padding:2px 6px; border-radius:10px; font-size:9px; font-weight:700; margin-left:6px;">Today</span>`;
-    } else if (m.diffDays <= 14) {
-      badgeHtml = `<span style="background:#e7f9f1; color:#009b75; padding:2px 6px; border-radius:10px; font-size:9px; font-weight:700; margin-left:6px;">In ${m.diffDays}d</span>`;
-    }
-
-    return `
-      <div class="item" onclick="showProjectDetails('${encodeURIComponent(m.projectName)}')" style="cursor:pointer;">
-        <strong>${m.step}</strong>
-        <small>${m.projectName} · ${m.dateStr} ${badgeHtml}</small>
-      </div>
-    `;
-  }).join('');
-}
-
-/* FUNGSI FORMAT MASA RELATIF */
-function formatTimeAgo(dateString) {
-  if (!dateString) return "Recently";
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return "Recently";
-
-  const now = new Date();
-  const seconds = Math.floor((now - date) / 1000);
-
-  if (seconds < 60) return "Just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days === 1) return "Yesterday";
-  if (days < 7) return `${days}d ago`;
-  
-  return date.toLocaleDateString("en-GB", { day: 'numeric', month: 'short' });
-}
-
-/* FUNGSI PAPARAN RECENT ACTIVITY TERKINI */
-function renderRecentActivity(projectsData) {
-  const container = $("recent-activity-container");
-  if (!container) return;
-
-  const sortedProjects = [...projectsData].sort((a, b) => {
-    const timeA = a.modifiedOn ? new Date(a.modifiedOn).getTime() : 0;
-    const timeB = b.modifiedOn ? new Date(b.modifiedOn).getTime() : 0;
-    
-    if (timeA > 0 && timeB > 0) {
-      return timeB - timeA;
-    }
-    return 0;
-  });
-
-  const displayActivities = sortedProjects.slice(0, 3);
-
-  if (displayActivities.length === 0) {
-    container.innerHTML = '<div class="item"><small style="color:#8492a9;">Tiada aktiviti terkini.</small></div>';
-    return;
-  }
-
-  container.innerHTML = displayActivities.map(p => {
-    const updateText = p.currentUpdate || "Progress update recorded";
-    const timeLabel = formatTimeAgo(p.modifiedOn);
-
-    return `
-      <div class="item" onclick="showProjectDetails('${encodeURIComponent(p.name)}')" style="cursor:pointer;">
-        <strong>${updateText}</strong>
-        <small>${p.name} · <span style="color:#3d78f6; font-weight:600;">${timeLabel}</span></small>
-      </div>
-    `;
-  }).join('');
-}
-
-/* POPUP DETAIL APABILA ITEM KLIK */
-function showProjectDetails(encodedProjectName) {
-  const projName = decodeURIComponent(encodedProjectName);
-  const proj = projects.find(p => p.name === projName);
-  if (!proj) return;
-
-  const modal = document.getElementById("risk-modal");
-  const modalTitle = document.getElementById("modal-title");
-  const projectListEl = document.getElementById("modal-project-list");
-
-  if (!modal || !projectListEl) return;
-
-  modalTitle.textContent = `📋 ${proj.name}`;
-  projectListEl.innerHTML = `
-    <div style="padding:10px 0;">
-      <p style="margin:5px 0; font-size:12px; color:#55657e;"><strong>Owner / Department:</strong> ${proj.dept}</p>
-      <p style="margin:5px 0; font-size:12px; color:#55657e;"><strong>Status:</strong> ${getStatusBadge(proj.status)}</p>
-      <p style="margin:5px 0; font-size:12px; color:#55657e;"><strong>Progress:</strong> ${proj.progress}%</p>
-      <p style="margin:5px 0; font-size:12px; color:#55657e;"><strong>Target Completion:</strong> ${proj.date}</p>
-      <hr style="border:0; border-top:1px solid #f0f3f9; margin:12px 0;">
-      <p style="margin:5px 0; font-size:12px; color:#15213a;"><strong>Latest Update:</strong><br>${proj.currentUpdate || 'Tiada kemas kini'}</p>
-      <p style="margin:8px 0 0; font-size:12px; color:#15213a;"><strong>Next Step (Milestone):</strong><br>${proj.currentStep || 'Tiada next step'} <em>(${proj.nextTargetDate || '-'})</em></p>
-    </div>
-  `;
-
-  modal.style.display = "flex";
-}
-
-let isExpanded = false; 
-
-function renderProjects(id, query = "") {
-  const targetEl = $(id);
-  if (!targetEl) return;
-
-  const filteredList = projects.filter(p =>
-    [p.name, p.dept, p.status, p.currentUpdate]
-      .join(" ").toLowerCase().includes(query.toLowerCase())
-  );
-
-  const isDashboard = (id === "dash-projects");
-  const displayList = (isDashboard && !isExpanded && !query) 
-    ? filteredList.slice(0, 6) 
-    : filteredList;
-
-  targetEl.innerHTML = displayList.map(p => {
-    return `
-      <tr>
-        <td class="project-name">
-          ${p.name}
-          <small>${p.dept}</small>
-        </td>
-        <td>${getStatusBadge(p.status)}</td>
-        <td><span style="color:#55657e; font-weight:500;">${p.currentUpdate}</span></td>
-        <td>
-          <div class="progress">
-            <span style="width:${p.progress}%"></span>
-          </div>
-          <small>${p.progress}%</small>
-        </td>
-        <td>${p.date}</td>
-      </tr>
-    `;
-  }).join("") || '<tr><td colspan="5">No matching projects.</td></tr>';
-
-  if (isDashboard && !query) {
-    const cardHeadBtn = document.querySelector('.card-head .link-btn');
-    if (cardHeadBtn && cardHeadBtn.dataset.goto === "projects") {
-      cardHeadBtn.textContent = isExpanded ? "View less ↑" : "View all →";
-      cardHeadBtn.onclick = (e) => {
-        e.preventDefault();
-        isExpanded = !isExpanded;
-        renderProjects("dash-projects");
-      };
-    }
-  }
-}
-
+/* 4. FETCH LIVE DATA FROM JSONBIN */
 async function fetchLiveProjects() {
   try {
     const binId = "6ad8359bac6210605a4454cb"; 
     const masterKey = "$2a$10$tdYTV25HHzjr8tsnCLITzu1V0l3h9A8GXRboOi6AXPvp87.xKtjyO"; 
-    const flowUrl = `https://api.jsonbin.io/v3/b/${binId}/latest`;
-
-    const response = await fetch(flowUrl, {
-      method: 'GET',
-      headers: {
-        'X-Master-Key': masterKey
-      }
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+      headers: { 'X-Master-Key': masterKey }
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
-    }
-
-    const result = await response.json();
+    if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+    const result = await res.json();
     const rawData = result.record || result;
     const items = Array.isArray(rawData) ? rawData : (rawData.value || []);
 
     if (items.length > 0) {
-      projects = items.map(row => {
-        let dateText = "-";
-        const rawDate = row.date || row.TargetCompletionDate || row.cr4a6_targetcompletiondate;
-        if (rawDate) {
-          const d = new Date(rawDate);
-          if (!isNaN(d.getTime())) {
-            dateText = d.toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' });
-          } else {
-            dateText = rawDate;
-          }
-        }
+      projects = items.map(row => ({
+        name: row.name || row.Project || row.cr4a6_newcolumn || "Untitled Project",
+        dept: row.dept || row.division || row.ProjectOwner || row.cr4a6_projectname || "Team",
+        status: row.status || row["Project Status"] || row.cr4a6_projectstatus || "On track",
+        update: row.update || row.currentUpdate || row["Current update"] || row.cr4a6_latestupdate || "Not started",
+        currentStep: row.currentStep || row.CurrentStep || row.cr4a6_currentstep || "Project setup",
+        nextTargetDate: row.nextTargetDate || row.NextTargetDate || row.cr4a6_nexttargetdate || "-",
+        progress: Number(row.progress ?? row.Progress ?? row.cr4a6_progress ?? 0),
+        date: row.date || row.TargetCompletionDate || row.cr4a6_targetcompletiondate || "-",
+        modifiedOn: row.modifiedon || row.modifiedOn || row.ModifiedOn || null
+      }));
 
-        let nextTargetDateText = "-";
-        const rawNextDate = row.nextTargetDate || row.NextTargetDate || row.cr4a6_nexttargetdate;
-        if (rawNextDate) {
-          const dNext = new Date(rawNextDate);
-          if (!isNaN(dNext.getTime())) {
-            nextTargetDateText = dNext.toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' });
-          } else {
-            nextTargetDateText = rawNextDate;
-          }
-        }
-
-        return {
-          name: row.name || row.Project || row.cr4a6_newcolumn || "Untitled Project",
-          dept: row.dept || row.ProjectOwner || row.cr4a6_projectname || "Team",
-          status: row.status || row["Project Status"] || row.cr4a6_projectstatus || "On Track",
-          currentUpdate: row.currentUpdate || row["Current update"] || row.cr4a6_latestupdate || "Not started",
-          currentStep: row.currentStep || row.CurrentStep || row.cr4a6_currentstep || "Project setup",
-          nextTargetDate: nextTargetDateText,
-          progress: (row.progress !== undefined && row.progress !== null) ? Number(row.progress) : ((row.Progress !== undefined && row.Progress !== null) ? Number(row.Progress) : (Number(row.cr4a6_progress) || 0)),
-          date: dateText,
-          modifiedOn: row.modifiedon || row.modifiedOn || row.ModifiedOn || row.cr4a6_modifiedon || row._updatedAt || row.updatedAt || null
-        };
-      });
-
-      const totalStat = document.querySelector('.stat strong');
-      if (totalStat) {
-        totalStat.textContent = projects.length;
-      }
-
-      updateDashboardStats(projects);
-      updateRiskOverviewStats(projects);
-      renderUpcomingMilestones(projects);
-      renderRecentActivity(projects);
-
-      renderProjects("dash-projects");
-      renderProjects("all-projects");
+      renderDashboard();
     }
   } catch (error) {
-    console.warn("Gagal menarik data dari JSONbin:", error);
+    console.warn("JSONBin Fetch Fallback to local state:", error);
+    renderDashboard();
   }
 }
 
-renderProjects("dash-projects");
-renderProjects("all-projects");
-renderUpcomingMilestones(projects);
-renderRecentActivity(projects);
-fetchLiveProjects();
+/* 5. RENDER DASHBOARD & STATS */
+function renderDashboard() {
+  const n = projects.length;
+  const atRisk = projects.filter(p => (p.status || "").toLowerCase().includes("risk")).length;
+  const onTrack = n - atRisk;
 
-if ($("dash-search")) {
-  $("dash-search").oninput = e => renderProjects("dash-projects", e.target.value);
-}
-if ($("all-search")) {
-  $("all-search").oninput = e => renderProjects("all-projects", e.target.value);
+  const today = new Date();
+  const in14 = new Date(); in14.setDate(today.getDate() + 14);
+  const upcoming = projects.filter(p => {
+    if ((p.status || "").toLowerCase().includes("complet")) return false;
+    const d = new Date((p.nextTargetDate || p.date) + "T12:00:00");
+    return !isNaN(d.getTime()) && d >= today && d <= in14;
+  }).length;
+
+  if ($("stat-total")) $("stat-total").textContent = n;
+  if ($("stat-ontrack")) $("stat-ontrack").textContent = onTrack;
+  if ($("stat-atrisk")) $("stat-atrisk").textContent = atRisk;
+  if ($("stat-upcoming")) $("stat-upcoming").textContent = upcoming;
+
+  if ($("trackPct")) $("trackPct").textContent = (n ? Math.round(onTrack/n*100) : 0) + "% of total";
+  if ($("riskPct")) $("riskPct").textContent = (n ? Math.round(atRisk/n*100) : 0) + "% of total";
+
+  // Divisions filter dropdown
+  const divisionSel = $("divisionFilter");
+  if (divisionSel) {
+    const oldVal = divisionSel.value;
+    divisionSel.innerHTML = '<option value="">All Divisions</option>' + 
+      [...new Set(projects.map(p => p.dept))].filter(Boolean).sort().map(d => `<option value="${d}">${d}</option>`).join("");
+    divisionSel.value = oldVal;
+  }
+
+  // Risk Donut Chart Computation
+  let high = 0, med = 0, low = 0;
+  projects.forEach(p => {
+    const st = (p.status || "").toLowerCase();
+    if (st.includes("risk")) high++;
+    else if (p.progress < 50) med++;
+    else low++;
+  });
+
+  if ($("risk-total")) $("risk-total").textContent = n;
+  if ($("risk-high")) $("risk-high").textContent = high;
+  if ($("risk-medium")) $("risk-medium").textContent = med;
+  if ($("risk-low")) $("risk-low").textContent = low;
+
+  const donut = $("donut");
+  if (donut) {
+    donut.style.background = n ? `conic-gradient(#f34e64 0 ${(high/n)*360}deg, #ffad45 ${(high/n)*360}deg ${((high+med)/n)*360}deg, #3775ff ${((high+med)/n)*360}deg 360deg)` : "#e9edf7";
+  }
+
+  applyDashFilters();
+  renderMilestonesAndActivity();
 }
 
+/* 6. FILTER & RENDER TABLES */
+function applyDashFilters() {
+  const q = ($("dash-search") ? $("dash-search").value : "").toLowerCase();
+  const stFilter = $("statusFilter") ? $("statusFilter").value : "";
+  const divFilter = $("divisionFilter") ? $("divisionFilter").value : "";
+
+  const filtered = projects.filter(p => {
+    const matchesQ = [p.name, p.dept, p.update].join(" ").toLowerCase().includes(q);
+    const matchesSt = !stFilter || (p.status || "").toLowerCase().includes(stFilter.toLowerCase());
+    const matchesDiv = !divFilter || p.dept === divFilter;
+    return matchesQ && matchesSt && matchesDiv;
+  });
+
+  const rowsHtml = filtered.map(p => `
+    <tr>
+      <td><strong>${p.name}</strong></td>
+      <td>${p.dept}</td>
+      <td>${getStatusBadge(p.status)}</td>
+      <td>${p.update}</td>
+      <td><div class="progress"><span style="width:${p.progress}%"></span></div> <small style="margin-left:4px;">${p.progress}%</small></td>
+      <td>${formatDate(p.date)}</td>
+    </tr>
+  `).join("");
+
+  if ($("dash-projects")) $("dash-projects").innerHTML = rowsHtml || '<tr><td colspan="6" class="empty">No matching projects found</td></tr>';
+
+  // All Projects page table
+  const allQ = ($("all-search") ? $("all-search").value : "").toLowerCase();
+  const allFiltered = projects.filter(p => [p.name, p.dept, p.update].join(" ").toLowerCase().includes(allQ));
+  
+  if ($("all-projects")) {
+    $("all-projects").innerHTML = allFiltered.map(p => `
+      <tr>
+        <td><strong>${p.name}</strong></td>
+        <td>${p.dept}</td>
+        <td>${getStatusBadge(p.status)}</td>
+        <td>${p.update}</td>
+        <td><div class="progress"><span style="width:${p.progress}%"></span></div> <small style="margin-left:4px;">${p.progress}%</small></td>
+        <td>${formatDate(p.date)}</td>
+      </tr>
+    `).join("") || '<tr><td colspan="6" class="empty">No projects found</td></tr>';
+  }
+}
+
+/* 7. MILESTONES & ACTIVITY */
+function renderMilestonesAndActivity() {
+  const milestoneList = $("upcoming-milestones-container");
+  if (milestoneList) {
+    const activeProjects = projects.filter(p => !(p.status || "").toLowerCase().includes("complet"));
+    milestoneList.innerHTML = activeProjects.slice(0, 3).map(p => `
+      <div class="item flex">
+        <span class="date">${formatDate(p.nextTargetDate || p.date)}</span>
+        <div>
+          <strong>${p.name}</strong>
+          <small>${p.currentStep || p.update}</small>
+        </div>
+      </div>
+    `).join("") || '<div class="empty">No upcoming milestones</div>';
+  }
+
+  const activityList = $("recent-activity-container");
+  if (activityList) {
+    activityList.innerHTML = projects.slice(-3).reverse().map(p => `
+      <div class="item">
+        <strong>● ${p.name}</strong>
+        <small>${p.update}</small>
+      </div>
+    `).join("") || '<div class="empty">No activity</div>';
+  }
+}
+
+/* 8. ROUTING & PAGES */
 const pageTitles = {
-  overview: [
-    "Your project portfolio at a glance",
-    "Track progress, identify risks and take action with your AI assistant."
-  ],
-  projects: [
-    "Project portfolio",
-    "Track projects and delivery progress."
-  ],
-  risks: [
-    "Risks & issues",
-    "Monitor project risks and issues."
-  ],
-  reports: [
-    "Reports & insights",
-    "Turn project information into actionable insights."
-  ],
-  documents: [
-    "Document workspace",
-    "Manage project documents and approvals."
-  ],
-  assistant: [
-    "AI Assistant",
-    "Work directly with PANTAS."
-  ]
+  overview: ["Your project portfolio at a glance", "Track progress, identify risks and take action with your AI assistant."],
+  projects: ["Project Portfolio Management", "View and monitor all active organizational projects."],
+  risks: ["Risk & Issue Register", "Identify, assess and monitor project risks and escalation triggers."],
+  reports: ["Reports & Analytics", "Portfolio health trends, resource utilization, and milestone metrics."],
+  documents: ["Document Workspace", "Access project blueprints, RFQ templates, and approval files."],
+  assistant: ["Full AI Workspace", "Interact directly with PANTAS for deep project insights."]
 };
 
 function setPage(name) {
-  document.querySelectorAll(".page").forEach(p =>
-    p.classList.toggle("active", p.id === "page-" + name)
-  );
+  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === "page-" + name));
+  document.querySelectorAll(".nav").forEach(n => {
+    n.classList.toggle("active", n.getAttribute("title") ? n.getAttribute("title").toLowerCase().includes(name.substring(0,4)) : false);
+  });
 
-  document.querySelectorAll(".nav-btn").forEach(b =>
-    b.classList.toggle("active", b.dataset.page === name)
-  );
-
-  if ($("page-heading")) $("page-heading").textContent = pageTitles[name][0];
-  if ($("page-subtitle")) $("page-subtitle").textContent = pageTitles[name][1];
+  if ($("page-heading") && pageTitles[name]) $("page-heading").textContent = pageTitles[name][0];
+  if ($("page-subtitle") && pageTitles[name]) $("page-subtitle").textContent = pageTitles[name][1];
 
   if (name === "assistant") loadChat("full-chat");
-
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-document.querySelectorAll("[data-page]").forEach(b =>
-  b.onclick = () => setPage(b.dataset.page)
-);
-
-document.querySelectorAll("[data-goto]").forEach(b =>
-  b.onclick = () => setPage(b.dataset.goto)
-);
-
-if ($("open-workspace")) $("open-workspace").onclick = () => setPage("assistant");
-
-if ($("sidebar-toggle")) {
-  $("sidebar-toggle").onclick = () => $("sidebar").classList.toggle("collapsed");
-}
-
-function loadChat(id, customUrl = baseEmbedUrl) {
-  const container = $(id);
+/* 9. COPILOT CHAT MODAL / POPUP */
+function loadChat(containerId, customUrl = baseEmbedUrl) {
+  const container = $(containerId);
   if (!container) return;
-  
   container.innerHTML = "";
-
   const iframe = document.createElement("iframe");
   iframe.src = customUrl;
-  iframe.title = "PANTAS Copilot Studio";
+  iframe.title = "PANTAS Copilot";
   iframe.setAttribute("allow", "clipboard-write");
   container.appendChild(iframe);
 }
@@ -1407,7 +873,7 @@ function loadChat(id, customUrl = baseEmbedUrl) {
 function openChat() {
   if ($("popup")) $("popup").classList.add("open");
   if ($("float-btn")) $("float-btn").textContent = "✕";
-  loadChat("popup-chat", baseEmbedUrl);
+  loadChat("popup-chat");
 }
 
 function closeChat() {
@@ -1415,118 +881,69 @@ function closeChat() {
   if ($("float-btn")) $("float-btn").textContent = "✦";
 }
 
-if ($("float-btn")) {
-  $("float-btn").onclick = () =>
-    $("popup").classList.contains("open") ? closeChat() : openChat();
-}
-
+if ($("float-btn")) $("float-btn").onclick = () => $("popup").classList.contains("open") ? closeChat() : openChat();
 if ($("close-chat")) $("close-chat").onclick = closeChat;
-
-if ($("new-project")) {
-  $("new-project").onclick = () => {
-    const promptUrl = baseEmbedUrl + "&pva_text=" + encodeURIComponent("I want to register a new project. Please ask me the project details.");
-    
-    if ($("popup")) $("popup").classList.add("open");
-    if ($("float-btn")) $("float-btn").textContent = "✕";
-    
-    loadChat("popup-chat", promptUrl);
-  };
-}
-
-document.querySelectorAll("[data-chat]").forEach(b => b.onclick = openChat);
 
 if ($("expand-chat")) {
   $("expand-chat").onclick = () => {
     $("popup").classList.toggle("expanded");
-    $("expand-chat").textContent =
-      $("popup").classList.contains("expanded") ? "❐" : "⛶";
+    $("expand-chat").textContent = $("popup").classList.contains("expanded") ? "❐" : "⛶";
   };
 }
 
-if ($("global-search")) {
-  $("global-search").onkeydown = e => {
-    if (e.key === "Enter") {
-      setPage("projects");
-      if ($("all-search")) $("all-search").value = e.target.value;
-      renderProjects("all-projects", e.target.value);
-    }
+if ($("btn-new-project")) {
+  $("btn-new-project").onclick = () => {
+    const promptUrl = baseEmbedUrl + "&pva_text=" + encodeURIComponent("I want to register a new project. Please ask me the project details.");
+    openChat();
+    loadChat("popup-chat", promptUrl);
   };
 }
 
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") closeChat();
-});
-
-/* FUNGSI MODAL POPUP RISK LEVEL */
+/* 10. RISK DETAILS MODAL */
 function showRiskProjects(level) {
-  const modal = document.getElementById("risk-modal");
-  const modalTitle = document.getElementById("modal-title");
-  const projectListEl = document.getElementById("modal-project-list");
-  
-  if (!modal || !projectListEl) return;
+  const modal = $("risk-modal");
+  const modalTitle = $("modal-title");
+  const list = $("modal-project-list");
+  if (!modal || !list) return;
 
-  const today = new Date();
-  
-  const filteredProjects = projects.filter(p => {
-    const status = (p.status || "").toLowerCase();
-    const progress = Number(p.progress) || 0;
-    
-    let diffDays = 999;
-    if (p.date && p.date !== "-") {
-      const targetDate = new Date(p.date);
-      if (!isNaN(targetDate.getTime())) {
-        diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
-      }
-    }
-
-    if (level === 'high') {
-      return status.includes('risk') || (diffDays >= 0 && diffDays <= 7 && progress < 50);
-    } else if (level === 'medium') {
-      return (diffDays > 7 && diffDays <= 14) || status.includes('delay') || (progress >= 50 && progress < 70);
-    } else if (level === 'low') {
-      return !status.includes('risk') && !status.includes('delay') && (diffDays > 14 || progress >= 70);
-    }
-    return false;
+  const filtered = projects.filter(p => {
+    const st = (p.status || "").toLowerCase();
+    if (level === 'high') return st.includes('risk');
+    if (level === 'medium') return !st.includes('risk') && p.progress < 50;
+    return !st.includes('risk') && p.progress >= 50;
   });
 
-  const titles = {
-    high: "🔴 High Impact Projects",
-    medium: "🟠 Medium Impact Projects",
-    low: "🔵 Low Impact Projects"
-  };
+  const titles = { high: "🔴 High Impact Projects", medium: "🟠 Medium Impact Projects", low: "🔵 Low Impact Projects" };
   modalTitle.textContent = titles[level] || "Project Details";
 
-  if (filteredProjects.length === 0) {
-    projectListEl.innerHTML = '<p style="color:#8492a9; text-align:center; padding:15px 0;">Tiada projek untuk tahap risiko ini.</p>';
-  } else {
-    projectListEl.innerHTML = filteredProjects.map(p => `
-      <div style="padding:12px 0; border-bottom:1px solid #f0f3f9; display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <strong style="display:block; font-size:13px; color:#15213a;">${p.name}</strong>
-          <small style="color:#8492a9;">Owner: ${p.dept} | Target: ${p.date}</small>
-        </div>
-        <div style="text-align:right;">
-          ${getStatusBadge(p.status)}
-          <div style="font-size:11px; color:#8492a9; margin-top:4px;">Progress: ${p.progress}%</div>
-        </div>
+  list.innerHTML = filtered.length ? filtered.map(p => `
+    <div style="padding:10px 0; border-bottom:1px solid #edf0f7; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <strong>${p.name}</strong>
+        <small style="color:#8190ac;">Division: ${p.dept} | Target: ${formatDate(p.date)}</small>
       </div>
-    `).join('');
-  }
+      <div style="text-align:right;">
+        ${getStatusBadge(p.status)}
+        <small style="display:block; margin-top:3px;">${p.progress}%</small>
+      </div>
+    </div>
+  `).join('') : '<p style="color:#8190ac; text-align:center; padding:15px;">No projects in this category.</p>';
 
-  modal.style.display = "flex";
+  modal.classList.add("open");
 }
 
 function closeRiskModal() {
-  const modal = document.getElementById("risk-modal");
-  if (modal) modal.style.display = "none";
+  if ($("risk-modal")) $("risk-modal").classList.remove("open");
 }
 
-window.onclick = function(event) {
-  const modal = document.getElementById("risk-modal");
-  if (event.target === modal) {
-    modal.style.display = "none";
-  }
-};
+/* LISTENERS */
+if ($("dash-search")) $("dash-search").oninput = applyDashFilters;
+if ($("all-search")) $("all-search").oninput = applyDashFilters;
+
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeChat(); closeRiskModal(); } });
+
+// INITIALIZE
+fetchLiveProjects();
 </script>
 
 </body>
