@@ -473,6 +473,7 @@ td small { display: block; color: #8996ae; margin-top: 4px; }
                 <th>CURRENT UPDATE</th>
                 <th>PROGRESS</th>
                 <th>TARGET DATE</th>
+                <th>ACTION</th>
               </tr>
             </thead>
             <tbody id="dash-projects"></tbody>
@@ -779,18 +780,26 @@ function applyDashFilters() {
     return matchesQ && matchesSt && matchesDiv;
   });
 
-  const rowsHtml = filtered.map(p => `
-    <tr>
-      <td><strong>${p.name}</strong></td>
-      <td>${p.dept}</td>
-      <td>${getStatusBadge(p.status)}</td>
-      <td>${p.update}</td>
-      <td><div class="progress"><span style="width:${p.progress}%"></span></div> <small style="margin-left:4px;">${p.progress}%</small></td>
-      <td>${formatDate(p.date)}</td>
-    </tr>
-  `).join("");
+  const rowsHtml = filtered.map(p => {
+    const isAtRisk = (p.status || "").toLowerCase().includes("risk");
+    const reminderBtn = isAtRisk 
+      ? `<button class="action" style="background:#fff0e5; color:#e56c27; border:1px solid #ffd8bf;" onclick="triggerSendReminder('${encodeURIComponent(p.name)}')" title="Send escalation reminder">🔔 Send Reminder</button>`
+      : `<span style="color:#8190ac; font-size:11px;">—</span>`;
 
-  if ($("dash-projects")) $("dash-projects").innerHTML = rowsHtml || '<tr><td colspan="6" class="empty">No matching projects found</td></tr>';
+    return `
+      <tr>
+        <td><strong>${p.name}</strong></td>
+        <td>${p.dept}</td>
+        <td>${getStatusBadge(p.status)}</td>
+        <td>${p.update}</td>
+        <td><div class="progress"><span style="width:${p.progress}%"></span></div> <small style="margin-left:4px;">${p.progress}%</small></td>
+        <td>${formatDate(p.date)}</td>
+        <td>${reminderBtn}</td>
+      </tr>
+    `;
+  }).join("");
+
+  if ($("dash-projects")) $("dash-projects").innerHTML = rowsHtml || '<tr><td colspan="7" class="empty">No matching projects found</td></tr>';
 
   // All Projects page table
   const allQ = ($("all-search") ? $("all-search").value : "").toLowerCase();
@@ -848,6 +857,15 @@ function showProjectDetails(encodedProjectName) {
   const list = $("modal-project-list");
   if (!modal || !list) return;
 
+  const isAtRisk = (proj.status || "").toLowerCase().includes("risk");
+  const reminderActionHtml = isAtRisk ? `
+    <div style="margin-top:18px; padding-top:12px; border-top:1px solid #edf0f7; text-align:right;">
+      <button class="primary" style="background: linear-gradient(100deg, #e56c27, #f34e64); padding:9px 15px; font-size:12px;" onclick="triggerSendReminder('${encodeURIComponent(proj.name)}')">
+        🔔 Send Escalation Reminder Flow
+      </button>
+    </div>
+  ` : '';
+
   modalTitle.textContent = `📋 ${proj.name}`;
   list.innerHTML = `
     <div style="padding:10px 0;">
@@ -858,10 +876,47 @@ function showProjectDetails(encodedProjectName) {
       <hr style="border:0; border-top:1px solid #edf0f7; margin:12px 0;">
       <p style="margin:6px 0; font-size:12px; color:#101e46;"><strong>Latest Update:</strong><br>${proj.update || 'Tiada kemas kini'}</p>
       <p style="margin:8px 0 0; font-size:12px; color:#101e46;"><strong>Next Step (Milestone):</strong><br>${proj.currentStep || 'Tiada milestone'} <em>(${formatDate(proj.nextTargetDate || proj.date)})</em></p>
+      ${reminderActionHtml}
     </div>
   `;
 
   modal.classList.add("open");
+}
+
+/* FUNGSI TRIGGER REMINDER KHAS UNTUK AT-RISK PROJECTS */
+/* FUNGSI TRIGGER REMINDER KHAS UNTUK AT-RISK PROJECTS */
+async function triggerSendReminder(encodedProjectName) {
+  const projName = decodeURIComponent(encodedProjectName);
+  const proj = projects.find(p => p.name === projName);
+  if (!proj) return;
+
+  const confirmSend = confirm(`[RISK ESCALATION]\nAdakah anda pasti mahu menghantar peringatan automatik untuk projek berisiko: "${proj.name}"?`);
+  if (!confirmSend) return;
+
+  // 🔽 TAMPAL (PASTE) HTTP POST URL DARIPADA POWER AUTOMATE DI SINI:
+  const flowWebhookUrl = "https://37954b566662eab58c43065ce3edaf.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/08/workflows/49baa8cefcac4b21adbabc6970ce5d5b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=jkheb0nHwBqvZJfg2d7qzOxrcPeOSkfWKl7WD42gTEI"; 
+
+  try {
+    const response = await fetch(flowWebhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        projectName: proj.name,
+        department: proj.dept,
+        status: proj.status,
+        update: proj.update
+      })
+    });
+
+    if (response.ok) {
+      alert(`✅ Escalation reminder successfully triggered for "${proj.name}"! Notification sent with PANTAS link.`);
+    } else {
+      alert(`⚠️ Flow triggered, but returned status: ${response.status}`);
+    }
+  } catch (err) {
+    console.error("Error triggering flow:", err);
+    alert("❌ Failed to trigger Power Automate flow.");
+  }
 }
 
 /* 8. ROUTING & PAGES */
