@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- AUTO REFRESH DASHBOARD SETIAP 30 SAAT -->
+<meta http-equiv="refresh" content="30">
 <title>Project Delivery Workspace | ProjectPilot AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -819,7 +821,7 @@ function applyDashFilters() {
   }
 }
 
-/* 7. MILESTONES & ACTIVITY (Boleh diklik untuk paparkan Popup Detail) */
+/* 7. MILESTONES & ACTIVITY */
 function renderMilestonesAndActivity() {
   const milestoneList = $("upcoming-milestones-container");
   if (milestoneList) {
@@ -884,7 +886,6 @@ function showProjectDetails(encodedProjectName) {
 }
 
 /* FUNGSI TRIGGER REMINDER KHAS UNTUK AT-RISK PROJECTS */
-/* FUNGSI TRIGGER REMINDER KHAS UNTUK AT-RISK PROJECTS */
 async function triggerSendReminder(encodedProjectName) {
   const projName = decodeURIComponent(encodedProjectName);
   const proj = projects.find(p => p.name === projName);
@@ -893,7 +894,6 @@ async function triggerSendReminder(encodedProjectName) {
   const confirmSend = confirm(`[RISK ESCALATION]\nAdakah anda pasti mahu menghantar peringatan automatik untuk projek berisiko: "${proj.name}"?`);
   if (!confirmSend) return;
 
-  // 🔽 TAMPAL (PASTE) HTTP POST URL DARIPADA POWER AUTOMATE DI SINI:
   const flowWebhookUrl = "https://37954b566662eab58c43065ce3edaf.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/08/workflows/49baa8cefcac4b21adbabc6970ce5d5b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=jkheb0nHwBqvZJfg2d7qzOxrcPeOSkfWKl7WD42gTEI"; 
 
   try {
@@ -1030,8 +1030,11 @@ if ($("all-search")) $("all-search").oninput = applyDashFilters;
 
 document.addEventListener("keydown", e => { if (e.key === "Escape") { closeChat(); closeRiskModal(); } });
 
-// INITIALIZE
+// INITIALIZE & AUTO REFRESH BACKGROUND DATA SETIAP 30 SAAT
 fetchLiveProjects();
+setInterval(() => {
+  fetchLiveProjects();
+}, 3000);
 </script>
 
 </body>
