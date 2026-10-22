@@ -1030,7 +1030,7 @@ if ($("all-search")) $("all-search").oninput = applyDashFilters;
 
 document.addEventListener("keydown", e => { if (e.key === "Escape") { closeChat(); closeRiskModal(); } });
 
-// INITIALIZE & AUTO REFRESH BACKGROUND DATA SETIAP 30 SAAT
+// INITIALIZE & AUTO REFRESH BACKGROUND DATA SETIAP 40 SAAT
 fetchLiveProjects();
 setInterval(() => {
   fetchLiveProjects();
